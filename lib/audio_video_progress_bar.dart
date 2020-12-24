@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+
+
 
 class ProgressBar extends LeafRenderObjectWidget {
   const ProgressBar({
@@ -10,11 +12,11 @@ class ProgressBar extends LeafRenderObjectWidget {
     @required this.totalDuration,
     this.bufferingProgress,
     this.onSeek,
-    this.barHeight,
+    this.barHeight = 5.0,
     this.baseBarColor,
     this.playingBarColor,
     this.bufferingBarColor,
-    this.thumbRadius = 20.0,
+    this.thumbRadius = 10.0,
     this.thumbColor,
   }) : super(key: key);
 
@@ -31,34 +33,36 @@ class ProgressBar extends LeafRenderObjectWidget {
 
   @override
   RenderProgressBar createRenderObject(BuildContext context) {
+    final theme = Theme.of(context);
     return RenderProgressBar(
       playingProgress: playingProgress,
       totalDuration: totalDuration,
       bufferingProgress: bufferingProgress,
       onSeek: onSeek,
       barHeight: barHeight,
-      baseBarColor: baseBarColor,
-      playingBarColor: playingBarColor,
-      bufferingBarColor: bufferingBarColor,
+      baseBarColor: baseBarColor ?? theme.colorScheme.primary.withOpacity(0.24),
+      playingBarColor: playingBarColor ?? theme.colorScheme.primary,
+      bufferingBarColor: bufferingBarColor ?? theme.colorScheme.primary.withOpacity(0.54),
       thumbRadius: thumbRadius,
-      thumbColor: thumbColor,
+      thumbColor: thumbColor ?? theme.colorScheme.primary,
     );
   }
 
   @override
   void updateRenderObject(
       BuildContext context, RenderProgressBar renderObject) {
+        final theme = Theme.of(context);
     renderObject
       ..playingProgress = playingProgress
       ..totalDuration = totalDuration
       ..bufferingProgress = bufferingProgress
       ..onSeek = onSeek
       ..barHeight = barHeight
-      ..baseBarColor = baseBarColor
-      ..playingBarColor = playingBarColor
-      ..bufferingBarColor = bufferingBarColor
+      ..baseBarColor = baseBarColor ?? theme.colorScheme.primary.withOpacity(0.24)
+      ..playingBarColor = playingBarColor ?? theme.colorScheme.primary
+      ..bufferingBarColor = bufferingBarColor ?? theme.colorScheme.primary.withOpacity(0.54)
       ..thumbRadius = thumbRadius
-      ..thumbColor = thumbColor;
+      ..thumbColor = thumbColor ?? theme.colorScheme.primary;
   }
 
   @override
@@ -269,7 +273,7 @@ class RenderProgressBar extends RenderBox {
     var endPoint = Offset(size.width, size.height / 2);
     canvas.drawLine(startPoint, endPoint, baseBarPaint);
 
-    // playing progress bar
+    // buffering progress bar
     final bufferingBarPaint = Paint()
       ..color = bufferingBarColor
       ..strokeWidth = barHeight;
@@ -285,7 +289,7 @@ class RenderProgressBar extends RenderBox {
     endPoint = Offset(playingWidth, size.height / 2);
     canvas.drawLine(startPoint, endPoint, playingBarPaint);
 
-    // paint thumb
+    // thumb
     final thumbPaint = Paint()..color = thumbColor;
     final thumbDx = _thumbValue * size.width;
     final center = Offset(thumbDx, size.height / 2);
