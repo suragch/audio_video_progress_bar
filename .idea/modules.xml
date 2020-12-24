@@ -3,8 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/audio_video_progress_bar.iml" filepath="$PROJECT_DIR$/audio_video_progress_bar.iml" />
-      <module fileurl="file://$PROJECT_DIR$/android/audio_video_progress_bar_android.iml" filepath="$PROJECT_DIR$/android/audio_video_progress_bar_android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/example/android/audio_video_progress_bar_example_android.iml" filepath="$PROJECT_DIR$/example/android/audio_video_progress_bar_example_android.iml" />
     </modules>
   </component>
 </project>
