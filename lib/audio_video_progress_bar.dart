@@ -3,7 +3,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-class ProgressBar extends LeafRenderObjectWidget {
+enum TimeLabelLocation {
+  below,
+  sides,
+  none,
+}
+
+class ProgressBar extends StatelessWidget {
   const ProgressBar({
     Key key,
     @required this.progress,
@@ -16,6 +22,130 @@ class ProgressBar extends LeafRenderObjectWidget {
     this.bufferedBarColor,
     this.thumbRadius = 10.0,
     this.thumbColor,
+    this.timeLabelLocation,
+    this.timeLabelStyle,
+  }) : super(key: key);
+
+  final Duration progress;
+  final Duration total;
+  final Duration buffered;
+  final ValueChanged<Duration> onSeek;
+  final Color baseBarColor;
+  final Color progressBarColor;
+  final Color bufferedBarColor;
+  final double barHeight;
+  final double thumbRadius;
+  final Color thumbColor;
+  final TimeLabelLocation timeLabelLocation;
+  final TextStyle timeLabelStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    if (timeLabelLocation == TimeLabelLocation.none) {
+      return _timeLabelNone(context);
+    }
+    final progressTime = _getTimeString(progress);
+    final totalTime = _getTimeString(total);
+
+    if (timeLabelLocation == TimeLabelLocation.sides) {
+      return _timeLabelOnSides(context, progressTime, totalTime);
+    }
+
+    return _timeLabelBelow(context, progressTime, totalTime);
+  }
+
+  Widget _timeLabelNone(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(width: thumbRadius),
+        Expanded(child: _basicProgressBar(context)),
+        SizedBox(width: thumbRadius),
+      ],
+    );
+  }
+
+  Widget _timeLabelBelow(BuildContext context, String progressTime, String totalTime) {
+    
+    return Row(
+      children: [
+        SizedBox(width: thumbRadius),
+        Expanded(
+          child: Column(
+            children: [
+              _basicProgressBar(context),
+              Row(
+                children: [
+                  Text(progressTime, style: timeLabelStyle),
+                  Spacer(),
+                  Text(totalTime, style: timeLabelStyle),
+                ],
+              ),
+            ],
+          ),
+        ),
+        SizedBox(width: thumbRadius),
+      ],
+    );
+  }
+
+  Widget _timeLabelOnSides(BuildContext context, String progressTime, String totalTime) {
+    final progressTime = _getTimeString(progress);
+    final totalTime = _getTimeString(total);
+    return Row(
+      children: [
+        Text(progressTime, style: timeLabelStyle),
+        SizedBox(width: thumbRadius + 5),
+        Expanded(child: _basicProgressBar(context)),
+        SizedBox(width: thumbRadius + 5),
+        Text(totalTime, style: timeLabelStyle),
+      ],
+    );
+  }
+
+  BasicProgressBar _basicProgressBar(BuildContext context) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
+    return BasicProgressBar(
+      progress: progress,
+      total: total,
+      buffered: buffered ?? Duration.zero,
+      onSeek: onSeek,
+      barHeight: barHeight,
+      baseBarColor: baseBarColor ?? primaryColor.withOpacity(0.24),
+      progressBarColor: progressBarColor ?? primaryColor,
+      bufferedBarColor: bufferedBarColor ?? primaryColor.withOpacity(0.24),
+      thumbRadius: thumbRadius,
+      thumbColor: thumbColor ?? primaryColor,
+    );
+  }
+
+  String _getTimeString(Duration time) {
+    final minutes = time.inMinutes
+        .remainder(Duration.minutesPerHour)
+        .toString()
+        .padLeft(2, '0');
+    final seconds = time.inSeconds
+        .remainder(Duration.secondsPerMinute)
+        .toString()
+        .padLeft(2, '0');
+    final hours = total.inHours > 0 ? '${time.inHours}:' : '';
+    return "$hours$minutes:$seconds";
+  }
+}
+
+class BasicProgressBar extends LeafRenderObjectWidget {
+  const BasicProgressBar({
+    Key key,
+    @required this.progress,
+    @required this.total,
+    @required this.buffered,
+    this.onSeek,
+    this.barHeight = 5.0,
+    @required this.baseBarColor,
+    @required this.progressBarColor,
+    @required this.bufferedBarColor,
+    this.thumbRadius = 10.0,
+    @required this.thumbColor,
   }) : super(key: key);
 
   final Duration progress;
@@ -30,50 +160,43 @@ class ProgressBar extends LeafRenderObjectWidget {
   final Color thumbColor;
 
   @override
-  RenderProgressBar createRenderObject(BuildContext context) {
-    final theme = Theme.of(context);
-    return RenderProgressBar(
+  _RenderProgressBar createRenderObject(BuildContext context) {
+    return _RenderProgressBar(
       progress: progress,
       total: total,
       buffered: buffered,
       onSeek: onSeek,
       barHeight: barHeight,
-      baseBarColor: baseBarColor ?? theme.colorScheme.primary.withOpacity(0.24),
-      progressBarColor: progressBarColor ?? theme.colorScheme.primary,
-      bufferedBarColor:
-          bufferedBarColor ?? theme.colorScheme.primary.withOpacity(0.24),
+      baseBarColor: baseBarColor,
+      progressBarColor: progressBarColor,
+      bufferedBarColor: bufferedBarColor,
       thumbRadius: thumbRadius,
-      thumbColor: thumbColor ?? theme.colorScheme.primary,
+      thumbColor: thumbColor,
     );
   }
 
   @override
   void updateRenderObject(
-      BuildContext context, RenderProgressBar renderObject) {
-    final theme = Theme.of(context);
+      BuildContext context, _RenderProgressBar renderObject) {
     renderObject
       ..progress = progress
       ..total = total
       ..buffered = buffered
       ..onSeek = onSeek
       ..barHeight = barHeight
-      ..baseBarColor =
-          baseBarColor ?? theme.colorScheme.primary.withOpacity(0.24)
-      ..progressBarColor = progressBarColor ?? theme.colorScheme.primary
-      ..bufferedBarColor =
-          bufferedBarColor ?? theme.colorScheme.primary.withOpacity(0.54)
+      ..baseBarColor = baseBarColor
+      ..progressBarColor = progressBarColor
+      ..bufferedBarColor = bufferedBarColor
       ..thumbRadius = thumbRadius
-      ..thumbColor = thumbColor ?? theme.colorScheme.primary;
+      ..thumbColor = thumbColor;
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties
-        .add(StringProperty('progress', progress.toString()));
+    properties.add(StringProperty('progress', progress.toString()));
     properties.add(StringProperty('total', total.toString()));
-    properties
-        .add(StringProperty('buffered', buffered.toString()));
+    properties.add(StringProperty('buffered', buffered.toString()));
     properties
         .add(ObjectFlagProperty<ValueChanged<Duration>>('onSeek', onSeek));
     properties.add(DoubleProperty('barHeight', barHeight));
@@ -85,8 +208,8 @@ class ProgressBar extends LeafRenderObjectWidget {
   }
 }
 
-class RenderProgressBar extends RenderBox {
-  RenderProgressBar({
+class _RenderProgressBar extends RenderBox {
+  _RenderProgressBar({
     Duration progress,
     Duration total,
     Duration buffered,
