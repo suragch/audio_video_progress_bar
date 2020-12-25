@@ -3,30 +3,28 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-
-
 class ProgressBar extends LeafRenderObjectWidget {
   const ProgressBar({
     Key key,
-    @required this.playingProgress,
-    @required this.totalDuration,
-    this.bufferingProgress,
+    @required this.progress,
+    @required this.total,
+    this.buffered,
     this.onSeek,
     this.barHeight = 5.0,
     this.baseBarColor,
-    this.playingBarColor,
-    this.bufferingBarColor,
+    this.progressBarColor,
+    this.bufferedBarColor,
     this.thumbRadius = 10.0,
     this.thumbColor,
   }) : super(key: key);
 
-  final Duration playingProgress;
-  final Duration totalDuration;
-  final Duration bufferingProgress;
+  final Duration progress;
+  final Duration total;
+  final Duration buffered;
   final ValueChanged<Duration> onSeek;
   final Color baseBarColor;
-  final Color playingBarColor;
-  final Color bufferingBarColor;
+  final Color progressBarColor;
+  final Color bufferedBarColor;
   final double barHeight;
   final double thumbRadius;
   final Color thumbColor;
@@ -35,14 +33,15 @@ class ProgressBar extends LeafRenderObjectWidget {
   RenderProgressBar createRenderObject(BuildContext context) {
     final theme = Theme.of(context);
     return RenderProgressBar(
-      playingProgress: playingProgress,
-      totalDuration: totalDuration,
-      bufferingProgress: bufferingProgress,
+      progress: progress,
+      total: total,
+      buffered: buffered,
       onSeek: onSeek,
       barHeight: barHeight,
       baseBarColor: baseBarColor ?? theme.colorScheme.primary.withOpacity(0.24),
-      playingBarColor: playingBarColor ?? theme.colorScheme.primary,
-      bufferingBarColor: bufferingBarColor ?? theme.colorScheme.primary.withOpacity(0.54),
+      progressBarColor: progressBarColor ?? theme.colorScheme.primary,
+      bufferedBarColor:
+          bufferedBarColor ?? theme.colorScheme.primary.withOpacity(0.24),
       thumbRadius: thumbRadius,
       thumbColor: thumbColor ?? theme.colorScheme.primary,
     );
@@ -51,16 +50,18 @@ class ProgressBar extends LeafRenderObjectWidget {
   @override
   void updateRenderObject(
       BuildContext context, RenderProgressBar renderObject) {
-        final theme = Theme.of(context);
+    final theme = Theme.of(context);
     renderObject
-      ..playingProgress = playingProgress
-      ..totalDuration = totalDuration
-      ..bufferingProgress = bufferingProgress
+      ..progress = progress
+      ..total = total
+      ..buffered = buffered
       ..onSeek = onSeek
       ..barHeight = barHeight
-      ..baseBarColor = baseBarColor ?? theme.colorScheme.primary.withOpacity(0.24)
-      ..playingBarColor = playingBarColor ?? theme.colorScheme.primary
-      ..bufferingBarColor = bufferingBarColor ?? theme.colorScheme.primary.withOpacity(0.54)
+      ..baseBarColor =
+          baseBarColor ?? theme.colorScheme.primary.withOpacity(0.24)
+      ..progressBarColor = progressBarColor ?? theme.colorScheme.primary
+      ..bufferedBarColor =
+          bufferedBarColor ?? theme.colorScheme.primary.withOpacity(0.54)
       ..thumbRadius = thumbRadius
       ..thumbColor = thumbColor ?? theme.colorScheme.primary;
   }
@@ -69,16 +70,16 @@ class ProgressBar extends LeafRenderObjectWidget {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-        .add(StringProperty('playingProgress', playingProgress.toString()));
-    properties.add(StringProperty('totalDuration', totalDuration.toString()));
+        .add(StringProperty('progress', progress.toString()));
+    properties.add(StringProperty('total', total.toString()));
     properties
-        .add(StringProperty('bufferingProgress', bufferingProgress.toString()));
+        .add(StringProperty('buffered', buffered.toString()));
     properties
         .add(ObjectFlagProperty<ValueChanged<Duration>>('onSeek', onSeek));
     properties.add(DoubleProperty('barHeight', barHeight));
     properties.add(ColorProperty('baseBarColor', baseBarColor));
-    properties.add(ColorProperty('playingBarColor', playingBarColor));
-    properties.add(ColorProperty('bufferingBarColor', bufferingBarColor));
+    properties.add(ColorProperty('progressBarColor', progressBarColor));
+    properties.add(ColorProperty('bufferedBarColor', bufferedBarColor));
     properties.add(DoubleProperty('thumbRadius', thumbRadius));
     properties.add(ColorProperty('thumbColor', thumbColor));
   }
@@ -86,46 +87,56 @@ class ProgressBar extends LeafRenderObjectWidget {
 
 class RenderProgressBar extends RenderBox {
   RenderProgressBar({
-    Duration playingProgress,
-    Duration totalDuration,
-    Duration bufferingProgress,
+    Duration progress,
+    Duration total,
+    Duration buffered,
     ValueChanged<Duration> onSeek,
     double barHeight,
     Color baseBarColor,
-    Color playingBarColor,
-    Color bufferingBarColor,
+    Color progressBarColor,
+    Color bufferedBarColor,
     double thumbRadius = 20.0,
     Color thumbColor,
-  })  : _playingProgress = playingProgress,
-        _totalDuration = totalDuration,
-        _bufferingProgress = bufferingProgress,
+  })  : _progress = progress,
+        _total = total,
+        _buffered = buffered,
         _onSeek = onSeek,
         _barHeight = barHeight,
         _baseBarColor = baseBarColor,
-        _playingBarColor = playingBarColor,
-        _bufferingBarColor = bufferingBarColor,
+        _progressBarColor = progressBarColor,
+        _bufferedBarColor = bufferedBarColor,
         _thumbRadius = thumbRadius,
         _thumbColor = thumbColor {
     _drag = HorizontalDragGestureRecognizer()
-      ..onStart = (DragStartDetails details) {
-        _userIsDraggingThumb = true;
-        _updateThumbPosition(details.localPosition);
-      }
-      ..onUpdate = (DragUpdateDetails details) {
-        _updateThumbPosition(details.localPosition);
-      }
-      ..onEnd = (DragEndDetails details) {
-        final thumbMiliseconds = _thumbValue * totalDuration.inMilliseconds;
-        onSeek(Duration(milliseconds: thumbMiliseconds.round()));
-        _userIsDraggingThumb = false;
-        markNeedsPaint();
-      }..onCancel = () {
-        _userIsDraggingThumb = false;
-        markNeedsPaint();
-      };
+      ..onStart = _onDragStart
+      ..onUpdate = _onDragUpdate
+      ..onEnd = _onDragEnd
+      ..onCancel = _finishDrag;
   }
 
+  HorizontalDragGestureRecognizer _drag;
+  double _thumbValue = 0.0;
   bool _userIsDraggingThumb = false;
+
+  void _onDragStart(DragStartDetails details) {
+    _userIsDraggingThumb = true;
+    _updateThumbPosition(details.localPosition);
+  }
+
+  void _onDragUpdate(DragUpdateDetails details) {
+    _updateThumbPosition(details.localPosition);
+  }
+
+  void _onDragEnd(DragEndDetails details) {
+    final thumbMiliseconds = _thumbValue * total.inMilliseconds;
+    onSeek(Duration(milliseconds: thumbMiliseconds.round()));
+    _finishDrag();
+  }
+
+  void _finishDrag() {
+    _userIsDraggingThumb = false;
+    markNeedsPaint();
+  }
 
   void _updateThumbPosition(Offset localPosition) {
     var dx = localPosition.dx.clamp(0, size.width);
@@ -133,33 +144,36 @@ class RenderProgressBar extends RenderBox {
     markNeedsPaint();
   }
 
-  Duration get playingProgress => _playingProgress;
-  Duration _playingProgress;
-  set playingProgress(Duration value) {
-    if (_playingProgress == value) {
+  Duration get progress => _progress;
+  Duration _progress;
+  set progress(Duration value) {
+    if (_progress == value) {
       return;
     }
-    _playingProgress = value;
+    _progress = value;
+    if (!_userIsDraggingThumb) {
+      _thumbValue = _proportionOfTotal(value);
+    }
     markNeedsPaint();
   }
 
-  Duration get totalDuration => _totalDuration;
-  Duration _totalDuration;
-  set totalDuration(Duration value) {
-    if (_totalDuration == value) {
+  Duration get total => _total;
+  Duration _total;
+  set total(Duration value) {
+    if (_total == value) {
       return;
     }
-    _totalDuration = value;
+    _total = value;
     markNeedsPaint();
   }
 
-  Duration get bufferingProgress => _bufferingProgress;
-  Duration _bufferingProgress;
-  set bufferingProgress(Duration value) {
-    if (_bufferingProgress == value) {
+  Duration get buffered => _buffered;
+  Duration _buffered;
+  set buffered(Duration value) {
+    if (_buffered == value) {
       return;
     }
-    _bufferingProgress = value;
+    _buffered = value;
     markNeedsPaint();
   }
 
@@ -188,19 +202,19 @@ class RenderProgressBar extends RenderBox {
     markNeedsPaint();
   }
 
-  Color get playingBarColor => _playingBarColor;
-  Color _playingBarColor;
-  set playingBarColor(Color value) {
-    if (_playingBarColor == value) return;
-    _playingBarColor = value;
+  Color get progressBarColor => _progressBarColor;
+  Color _progressBarColor;
+  set progressBarColor(Color value) {
+    if (_progressBarColor == value) return;
+    _progressBarColor = value;
     markNeedsPaint();
   }
 
-  Color get bufferingBarColor => _bufferingBarColor;
-  Color _bufferingBarColor;
-  set bufferingBarColor(Color value) {
-    if (_bufferingBarColor == value) return;
-    _bufferingBarColor = value;
+  Color get bufferedBarColor => _bufferedBarColor;
+  Color _bufferedBarColor;
+  set bufferedBarColor(Color value) {
+    if (_bufferedBarColor == value) return;
+    _bufferedBarColor = value;
     markNeedsPaint();
   }
 
@@ -221,6 +235,7 @@ class RenderProgressBar extends RenderBox {
   }
 
   static const _minDesiredWidth = 100.0;
+  double get _desiredHeight => 2 * thumbRadius;
 
   @override
   double computeMinIntrinsicWidth(double height) => _minDesiredWidth;
@@ -233,10 +248,6 @@ class RenderProgressBar extends RenderBox {
 
   @override
   double computeMaxIntrinsicHeight(double width) => _desiredHeight;
-
-  double get _desiredHeight => 2 * thumbRadius;
-
-  HorizontalDragGestureRecognizer _drag;
 
   @override
   bool hitTestSelf(Offset position) => true;
@@ -257,39 +268,48 @@ class RenderProgressBar extends RenderBox {
     size = constraints.constrain(desiredSize);
   }
 
-  double _thumbValue = 0.5;
-
   @override
   void paint(PaintingContext context, Offset offset) {
     final canvas = context.canvas;
     canvas.save();
     canvas.translate(offset.dx, offset.dy);
+    _drawBaseBar(canvas);
+    _drawBufferedBar(canvas);
+    _drawProgressBar(canvas);
+    _drawThumb(canvas);
+    canvas.restore();
+  }
 
-    // base bar
+  void _drawBaseBar(Canvas canvas) {
     final baseBarPaint = Paint()
       ..color = baseBarColor
       ..strokeWidth = barHeight;
     final startPoint = Offset(0, size.height / 2);
     var endPoint = Offset(size.width, size.height / 2);
     canvas.drawLine(startPoint, endPoint, baseBarPaint);
+  }
 
-    // buffering progress bar
-    final bufferingBarPaint = Paint()
-      ..color = bufferingBarColor
+  void _drawBufferedBar(Canvas canvas) {
+    final bufferedBarPaint = Paint()
+      ..color = bufferedBarColor
       ..strokeWidth = barHeight;
-    final bufferingWidth = _widthComplete(bufferingProgress);
-    endPoint = Offset(bufferingWidth, size.height / 2);
-    canvas.drawLine(startPoint, endPoint, bufferingBarPaint);
+    final bufferedWidth = _proportionOfTotal(_buffered) * size.width;
+    final startPoint = Offset(0, size.height / 2);
+    final endPoint = Offset(bufferedWidth, size.height / 2);
+    canvas.drawLine(startPoint, endPoint, bufferedBarPaint);
+  }
 
-    // playing progress bar
-    final playingBarPaint = Paint()
-      ..color = playingBarColor
+  void _drawProgressBar(Canvas canvas) {
+    final progressBarPaint = Paint()
+      ..color = progressBarColor
       ..strokeWidth = barHeight;
-    final playingWidth = _widthComplete(playingProgress);
-    endPoint = Offset(playingWidth, size.height / 2);
-    canvas.drawLine(startPoint, endPoint, playingBarPaint);
+    final progressWidth = _proportionOfTotal(_progress) * size.width;
+    final startPoint = Offset(0, size.height / 2);
+    final endPoint = Offset(progressWidth, size.height / 2);
+    canvas.drawLine(startPoint, endPoint, progressBarPaint);
+  }
 
-    // thumb
+  void _drawThumb(Canvas canvas) {
     final thumbPaint = Paint()..color = thumbColor;
     final thumbDx = _thumbValue * size.width;
     final center = Offset(thumbDx, size.height / 2);
@@ -298,13 +318,14 @@ class RenderProgressBar extends RenderBox {
       canvas.drawCircle(center, 30, thumbGlowPaint);
     }
     canvas.drawCircle(center, thumbRadius, thumbPaint);
-
-    canvas.restore();
   }
 
-  double _widthComplete(Duration duration) {
-    final proportion = duration.inMilliseconds / totalDuration.inMilliseconds;
-    return proportion * size.width;
+  double _proportionOfTotal(Duration duration) {
+    if (total.inMilliseconds == 0) {
+      return 0.0;
+    }
+    final proportion = duration.inMilliseconds / total.inMilliseconds;
+    return proportion;
   }
 
   @override
