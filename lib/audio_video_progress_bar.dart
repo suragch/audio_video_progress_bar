@@ -391,6 +391,9 @@ class _RenderProgressBar extends RenderBox {
     size = constraints.constrain(desiredSize);
   }
 
+  // @override
+  // bool get isRepaintBoundary => true;
+
   @override
   void paint(PaintingContext context, Offset offset) {
     final canvas = context.canvas;
@@ -453,7 +456,37 @@ class _RenderProgressBar extends RenderBox {
 
   @override
   void describeSemanticsConfiguration(SemanticsConfiguration config) {
-    // TODO: implement describeSemanticsConfiguration
     super.describeSemanticsConfiguration(config);
+
+    // description
+    config.textDirection = TextDirection.ltr;
+    config.label = 'Progress bar';
+    config.value = '${(_thumbValue * 100).round()}%';
+
+    // increase action
+    config.onIncrease = increaseAction;
+    final increased = _thumbValue + _semanticActionUnit;
+    config.increasedValue = '${((increased).clamp(0.0, 1.0) * 100).round()}%';
+
+    // descrease action
+    config.onDecrease = decreaseAction;
+    final decreased = _thumbValue - _semanticActionUnit;
+    config.decreasedValue = '${((decreased).clamp(0.0, 1.0) * 100).round()}%';
+  }
+
+  static const double _semanticActionUnit = 0.05;
+
+  void increaseAction() {
+    final newValue = _thumbValue + _semanticActionUnit;
+    _thumbValue = (newValue).clamp(0.0, 1.0);
+    markNeedsPaint();
+    markNeedsSemanticsUpdate();
+  }
+
+  void decreaseAction() {
+    final newValue = _thumbValue - _semanticActionUnit;
+    _thumbValue = (newValue).clamp(0.0, 1.0);
+    markNeedsPaint();
+    markNeedsSemanticsUpdate();
   }
 }
