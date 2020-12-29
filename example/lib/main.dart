@@ -59,6 +59,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     print("building app");
     return Scaffold(
       body: Column(
+        
         children: [
           Spacer(),
           RepaintBoundary(
@@ -100,6 +101,7 @@ class ProgressBarWidget extends StatelessWidget {
           progress: progress,
           buffered: buffered,
           total: total,
+          //timeLabelLocation: TimeLabelLocation.none,
           onSeek: (duration) {
             _player.seek(duration);
           },
