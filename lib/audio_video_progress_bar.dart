@@ -5,13 +5,27 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+/// This is where the current time and total time labels should appear in
+/// relation to the progress bar.
 enum TimeLabelLocation {
   below,
   sides,
   none,
 }
 
+/// A progress bar widget to show or set the location of the currently
+/// playing audio or video content.
+///
+/// This widget does not itself play audio or video content, but you can
+/// use it in conjunction with an audio plugin. It is a more convenient
+/// replacement for the Flutter Slider widget.
 class ProgressBar extends LeafRenderObjectWidget {
+  /// You must set the current audio or video duration [progress] and also
+  /// the [total] duration. Optionally set the [buffered] content progress
+  /// as well.
+  ///
+  /// When a user drags the thumb to a new location you can be notified
+  /// by the [onSeek] callback so that you can update your audio/video player.
   const ProgressBar({
     Key key,
     @required this.progress,
@@ -27,16 +41,62 @@ class ProgressBar extends LeafRenderObjectWidget {
     this.timeLabelLocation,
   }) : super(key: key);
 
+  /// The elapsed playing time of the media.
+  ///
+  /// This should not be greater than the [total] time.
   final Duration progress;
+
+  /// The total duration of the media.
   final Duration total;
+
+  /// The currently buffered content of the media.
+  ///
+  /// This is useful for streamed content. If you are playing a local file
+  /// then you can leave this out.
   final Duration buffered;
+
+  /// A callback when user moves the thumb.
+  ///
+  /// When the user moved the thumb on the progress bar this callback will
+  /// run. It will not run until after the user has finished the touch event.
+  ///
+  /// You will get the chosen duration to start playing at which you can pass
+  /// on to your media player.
   final ValueChanged<Duration> onSeek;
+
+  /// The color of the progress bar before playback has started.
+  ///
+  /// By default it is a transparent version of your theme's primary color.
   final Color baseBarColor;
+
+  /// The color of the progress bar to the left of the current playing
+  /// [progress].
+  ///
+  /// By default it is your theme's primary color.
   final Color progressBarColor;
+
+  /// The color of the progress bar between the [progress] location and the
+  /// [buffered] location.
+  ///
+  /// By default it is a transparent version of your theme's primary color,
+  /// a shade darker than [baseBarColor].
   final Color bufferedBarColor;
+
+  /// The vertical thickness of the progress bar.
   final double barHeight;
+
+  /// The radius of the circle for the moveable progress bar thumb.
   final double thumbRadius;
+
+  /// The color of the circle for the moveable progress bar thumb.
+  ///
+  /// By default it is your theme's primary color.
   final Color thumbColor;
+
+  /// The location for the [progress] and [total] duration text labels.
+  ///
+  /// By default the labels appear under the progress bar but you can also
+  /// put them on the sides or remove them altogether.
   final TimeLabelLocation timeLabelLocation;
 
   @override
@@ -135,8 +195,17 @@ class _RenderProgressBar extends RenderBox {
     _rightTimeLabel = _setTimeLabel(progress);
   }
 
+  // This is the gesture recognizer used to move the thumb.
   HorizontalDragGestureRecognizer _drag;
+
+  // This is a value between 0.0 and 1.0 used to indicate the position on
+  // the bar.
   double _thumbValue = 0.0;
+
+  // The thumb can move for two reasons. One is that the [progress] changed.
+  // The other is that the user is dragging the thumb. This variable keeps
+  // track of that so that while the user is dragging the thumb at the same
+  // time as a [progress] update there won't be a conflict.
   bool _userIsDraggingThumb = false;
 
   void _onDragStart(DragStartDetails details) {
@@ -159,6 +228,10 @@ class _RenderProgressBar extends RenderBox {
     markNeedsPaint();
   }
 
+  // This needs to stay in sync with the layout. This could be a potential
+  // source of bugs if there is a layout change but we forget to update this.
+  // It might be a good idea to redesign the architecture so that there is
+  // only one place to make changes.
   void _updateThumbPosition(Offset localPosition) {
     final dx = localPosition.dx;
     double barStart;
@@ -176,6 +249,9 @@ class _RenderProgressBar extends RenderBox {
     markNeedsPaint();
   }
 
+  /// The play location of the media.
+  ///
+  /// This is used to update the thumb value and the left time label.
   Duration get progress => _progress;
   Duration _progress;
   TextPainter _leftTimeLabel;
@@ -186,7 +262,9 @@ class _RenderProgressBar extends RenderBox {
     _progress = value;
     if (!_userIsDraggingThumb) {
       _thumbValue = _proportionOfTotal(value);
-      _leftTimeLabel = _setTimeLabel(value);
+      if (_timeLabelLocation != TimeLabelLocation.none) {
+        _leftTimeLabel = _setTimeLabel(value);
+      }
     }
     markNeedsPaint();
   }
@@ -205,6 +283,7 @@ class _RenderProgressBar extends RenderBox {
     return textPainter;
   }
 
+  /// The total time length of the media.
   Duration get total => _total;
   Duration _total;
   TextPainter _rightTimeLabel;
@@ -217,6 +296,7 @@ class _RenderProgressBar extends RenderBox {
     markNeedsPaint();
   }
 
+  /// The buffered length of the media when streaming.
   Duration get buffered => _buffered;
   Duration _buffered;
   set buffered(Duration value) {
@@ -227,6 +307,7 @@ class _RenderProgressBar extends RenderBox {
     markNeedsPaint();
   }
 
+  /// A callback for the audio duration position to where the thumb was moved.
   ValueChanged<Duration> get onSeek => _onSeek;
   ValueChanged<Duration> _onSeek;
   set onSeek(ValueChanged<Duration> value) {
@@ -236,6 +317,7 @@ class _RenderProgressBar extends RenderBox {
     _onSeek = value;
   }
 
+  /// The vertical thickness of the bar that the thumb moves along.
   double get barHeight => _barHeight;
   double _barHeight;
   set barHeight(double value) {
@@ -244,6 +326,7 @@ class _RenderProgressBar extends RenderBox {
     markNeedsPaint();
   }
 
+  /// The color of the progress bar before any playing or buffering.
   Color get baseBarColor => _baseBarColor;
   Color _baseBarColor;
   set baseBarColor(Color value) {
@@ -252,6 +335,7 @@ class _RenderProgressBar extends RenderBox {
     markNeedsPaint();
   }
 
+  /// The color of the played portion of the progress bar.
   Color get progressBarColor => _progressBarColor;
   Color _progressBarColor;
   set progressBarColor(Color value) {
@@ -260,6 +344,7 @@ class _RenderProgressBar extends RenderBox {
     markNeedsPaint();
   }
 
+  /// The color of the visible buffered portion of the progress bar.
   Color get bufferedBarColor => _bufferedBarColor;
   Color _bufferedBarColor;
   set bufferedBarColor(Color value) {
@@ -268,6 +353,7 @@ class _RenderProgressBar extends RenderBox {
     markNeedsPaint();
   }
 
+  /// The color of the moveable thumb.
   Color get thumbColor => _thumbColor;
   Color _thumbColor;
   set thumbColor(Color value) {
@@ -276,6 +362,7 @@ class _RenderProgressBar extends RenderBox {
     markNeedsPaint();
   }
 
+  /// The length of the radius for the circular thumb.
   double get thumbRadius => _thumbRadius;
   double _thumbRadius;
   set thumbRadius(double value) {
@@ -284,6 +371,7 @@ class _RenderProgressBar extends RenderBox {
     markNeedsLayout();
   }
 
+  /// The position of the duration text labels for the progress and total time.
   TimeLabelLocation get timeLabelLocation => _timeLabelLocation;
   TimeLabelLocation _timeLabelLocation;
   set timeLabelLocation(TimeLabelLocation value) {
@@ -292,6 +380,8 @@ class _RenderProgressBar extends RenderBox {
     markNeedsLayout();
   }
 
+  /// The text style for the duration text labels. By default this style is
+  /// taken from the theme's [textStyle.bodyText1].
   TextStyle get timeLabelTextStyle => _timeLabelTextStyle;
   TextStyle _timeLabelTextStyle;
   set timeLabelTextStyle(TextStyle value) {
@@ -300,6 +390,7 @@ class _RenderProgressBar extends RenderBox {
     markNeedsLayout();
   }
 
+  // The smallest that this widget would ever want to be.
   static const _minDesiredWidth = 100.0;
 
   @override
@@ -325,6 +416,7 @@ class _RenderProgressBar extends RenderBox {
     }
   }
 
+  // TODO: Use computeDryLayout instead.
   @override
   void performLayout() {
     final desiredWidth = constraints.maxWidth;
@@ -333,6 +425,8 @@ class _RenderProgressBar extends RenderBox {
     size = constraints.constrain(desiredSize);
   }
 
+  // When changing these remember to keep the gesture recognizer for the
+  // thumb in sync.
   double _calculateDesiredHeight() {
     switch (_timeLabelLocation) {
       case TimeLabelLocation.below:
@@ -360,8 +454,8 @@ class _RenderProgressBar extends RenderBox {
     return _leftTimeLabel.height;
   }
 
-  // @override
-  // bool get isRepaintBoundary => true;
+  @override
+  bool get isRepaintBoundary => true;
 
   @override
   void paint(PaintingContext context, Offset offset) {
@@ -412,18 +506,11 @@ class _RenderProgressBar extends RenderBox {
   ///  | 01:23 -------O---------------- 05:00 |
   ///
   void _drawProgressBarWithLabelsOnSides(Canvas canvas) {
-    // if (_leftTimeLabel == null || _rightTimeLabel == null) {
-    //   return;
-    // }
-
     // calculate sizes
     final padding = _thumbRadius;
     final barHeight = 2 * _thumbRadius;
 
     // current time label
-    // if (_leftTimeLabel == null) {
-    //   _leftTimeLabel = _setLe
-    // }
     final verticalOffset = size.height / 2 - _leftTimeLabel.height / 2;
     final currentLabelOffset = Offset(0, verticalOffset);
     _leftTimeLabel.paint(canvas, currentLabelOffset);
@@ -438,12 +525,16 @@ class _RenderProgressBar extends RenderBox {
     final barWidth =
         size.width - 2 * padding - leftLabelWidth - _rightTimeLabel.width;
     _drawProgressBar(
-        canvas, Offset(padding + leftLabelWidth, 0), Size(barWidth, barHeight));
+      canvas,
+      Offset(padding + leftLabelWidth, 0),
+      Size(barWidth, barHeight),
+    );
   }
 
-  /// Draw the progress bar with padding
+  /// Draw the progress bar without labels like this:
   ///
   /// | -------O---------------- |
+  /// 
   void _drawProgressBarWithoutLabels(Canvas canvas) {
     final padding = _thumbRadius;
     final barWidth = size.width - 2 * padding;
@@ -546,6 +637,8 @@ class _RenderProgressBar extends RenderBox {
     config.decreasedValue = '${((decreased).clamp(0.0, 1.0) * 100).round()}%';
   }
 
+  // This is how much to move the thumb if the move is triggered by a 
+  // semantic action rather than a touch event. 
   static const double _semanticActionUnit = 0.05;
 
   void increaseAction() {
