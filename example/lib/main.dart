@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
+        primarySwatch: Colors.blue,
       ),
       home: HomeWidget(),
     );
@@ -63,62 +63,67 @@ class _HomeWidgetState extends State<HomeWidget> {
   Widget build(BuildContext context) {
     print("building app");
     return Scaffold(
-      body: Column(
-        children: [
-          Spacer(),
-          StreamBuilder<DurationState>(
-            stream: _durationState,
-            builder: (context, snapshot) {
-              final durationState = snapshot.data;
-              final progress = durationState?.progress ?? Duration.zero;
-              final buffered = durationState?.buffered ?? Duration.zero;
-              final total = durationState?.total ?? Duration.zero;
-              return ProgressBar(
-                progress: progress,
-                buffered: buffered,
-                total: total,
-                onSeek: (duration) {
-                  _player.seek(duration);
-                },
-              );
-            },
-          ),
-          StreamBuilder<PlayerState>(
-            stream: _player.playerStateStream,
-            builder: (context, snapshot) {
-              final playerState = snapshot.data;
-              final processingState = playerState?.processingState;
-              final playing = playerState?.playing;
-              if (processingState == ProcessingState.loading ||
-                  processingState == ProcessingState.buffering) {
-                return Container(
-                  margin: EdgeInsets.all(8.0),
-                  width: 64.0,
-                  height: 64.0,
-                  child: CircularProgressIndicator(),
+      backgroundColor: Colors.white,
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            Spacer(),
+            StreamBuilder<DurationState>(
+              stream: _durationState,
+              builder: (context, snapshot) {
+                final durationState = snapshot.data;
+                final progress = durationState?.progress ?? Duration.zero;
+                final buffered = durationState?.buffered ?? Duration.zero;
+                final total = durationState?.total ?? Duration.zero;
+                return ProgressBar(
+                  progress: progress,
+                  buffered: buffered,
+                  total: total,
+                  onSeek: (duration) {
+                    _player.seek(duration);
+                  },
                 );
-              } else if (playing != true) {
-                return IconButton(
-                  icon: Icon(Icons.play_arrow),
-                  iconSize: 64.0,
-                  onPressed: _player.play,
-                );
-              } else if (processingState != ProcessingState.completed) {
-                return IconButton(
-                  icon: Icon(Icons.pause),
-                  iconSize: 64.0,
-                  onPressed: _player.pause,
-                );
-              } else {
-                return IconButton(
-                  icon: Icon(Icons.replay),
-                  iconSize: 64.0,
-                  onPressed: () => _player.seek(Duration.zero),
-                );
-              }
-            },
-          ),
-        ],
+              },
+            ),
+            SizedBox(height: 50,),
+            StreamBuilder<PlayerState>(
+              stream: _player.playerStateStream,
+              builder: (context, snapshot) {
+                final playerState = snapshot.data;
+                final processingState = playerState?.processingState;
+                final playing = playerState?.playing;
+                if (processingState == ProcessingState.loading ||
+                    processingState == ProcessingState.buffering) {
+                  return Container(
+                    margin: EdgeInsets.all(8.0),
+                    width: 32.0,
+                    height: 32.0,
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (playing != true) {
+                  return IconButton(
+                    icon: Icon(Icons.play_arrow),
+                    iconSize: 32.0,
+                    onPressed: _player.play,
+                  );
+                } else if (processingState != ProcessingState.completed) {
+                  return IconButton(
+                    icon: Icon(Icons.pause),
+                    iconSize: 32.0,
+                    onPressed: _player.pause,
+                  );
+                } else {
+                  return IconButton(
+                    icon: Icon(Icons.replay),
+                    iconSize: 32.0,
+                    onPressed: () => _player.seek(Duration.zero),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

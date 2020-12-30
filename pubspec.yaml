@@ -1,5 +1,5 @@
 name: audio_video_progress_bar
-description: A seekbar widget to show or change the position of an audio or video stream.
+description: A progress bar widget to show or change the position of an audio or video stream.
 version: 0.1.0
 homepage: https://github.com/suragch/audio_video_progress_bar
 
