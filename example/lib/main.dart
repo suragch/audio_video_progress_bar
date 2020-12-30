@@ -12,9 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: HomeWidget(),
     );
   }
@@ -54,16 +52,15 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   @override
-    void dispose() {
-      _player.dispose();
-      super.dispose();
-    }
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     print("building app");
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -76,17 +73,18 @@ class _HomeWidgetState extends State<HomeWidget> {
                 final progress = durationState?.progress ?? Duration.zero;
                 final buffered = durationState?.buffered ?? Duration.zero;
                 final total = durationState?.total ?? Duration.zero;
-                return ProgressBar(
-                  progress: progress,
-                  buffered: buffered,
-                  total: total,
-                  onSeek: (duration) {
-                    _player.seek(duration);
-                  },
-                );
+                return 
+ProgressBar(
+  progress: progress,
+  buffered: buffered,
+  total: total,
+  timeLabelLocation: TimeLabelLocation.sides,
+  onSeek: (duration) {
+    _player.seek(duration);
+  },
+);
               },
             ),
-            SizedBox(height: 50,),
             StreamBuilder<PlayerState>(
               stream: _player.playerStateStream,
               builder: (context, snapshot) {
