@@ -73,16 +73,15 @@ class _HomeWidgetState extends State<HomeWidget> {
                 final progress = durationState?.progress ?? Duration.zero;
                 final buffered = durationState?.buffered ?? Duration.zero;
                 final total = durationState?.total ?? Duration.zero;
-                return 
-ProgressBar(
-  progress: progress,
-  buffered: buffered,
-  total: total,
-  timeLabelLocation: TimeLabelLocation.sides,
-  onSeek: (duration) {
-    _player.seek(duration);
-  },
-);
+                return ProgressBar(
+                  progress: progress,
+                  buffered: buffered,
+                  total: total,
+                  timeLabelLocation: TimeLabelLocation.sides,
+                  onSeek: (duration) {
+                    _player.seek(duration);
+                  },
+                );
               },
             ),
             StreamBuilder<PlayerState>(

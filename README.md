@@ -56,6 +56,8 @@ You'll probably want to add other buttons like start and pause, but these are no
 
 ![](https://github.com/suragch/audio_video_progress_bar/blob/master/supplemental/progress_bar_demo_with_buttons.gif)
 
+Thanks to the [just_audio code example](https://github.com/ryanheise/just_audio/blob/master/just_audio/example/lib/main.dart) for help with the buttons.
+
 ## Customization
 
 The default colors use the theme's primary color, so changing the theme will also update this widget:
@@ -98,10 +100,12 @@ ProgressBar(
 );
 ```
 
+Now the time labels are displayed on the side:
+
 ![](https://github.com/suragch/audio_video_progress_bar/blob/master/supplemental/side_labels.png)
 
 ## Notes
 
-If your interested in how this widget was made, check out the article [Creating a Flutter widget from scratch](https://suragch.medium.com/creating-a-flutter-widget-from-scratch-a9c01c47c630)
+If your interested in how this widget was made, check out the article [Creating a Flutter widget from scratch](https://suragch.medium.com/creating-a-flutter-widget-from-scratch-a9c01c47c630).
 
-If you find any bugs, feel free to open an issue.
+Please open an issue if you find any bugs.
