@@ -534,7 +534,7 @@ class _RenderProgressBar extends RenderBox {
   /// Draw the progress bar without labels like this:
   ///
   /// | -------O---------------- |
-  /// 
+  ///
   void _drawProgressBarWithoutLabels(Canvas canvas) {
     final padding = _thumbRadius;
     final barWidth = size.width - 2 * padding;
@@ -637,8 +637,8 @@ class _RenderProgressBar extends RenderBox {
     config.decreasedValue = '${((decreased).clamp(0.0, 1.0) * 100).round()}%';
   }
 
-  // This is how much to move the thumb if the move is triggered by a 
-  // semantic action rather than a touch event. 
+  // This is how much to move the thumb if the move is triggered by a
+  // semantic action rather than a touch event.
   static const double _semanticActionUnit = 0.05;
 
   void increaseAction() {
