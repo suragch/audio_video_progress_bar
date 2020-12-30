@@ -4,6 +4,8 @@ A progress bar widget to show or change the position of an audio or video stream
 
 ![](https://github.com/suragch/audio_video_progress_bar/blob/master/supplemental/progress_bar_demo.gif)
 
+***Note**: This package does not play audio or video itself. It's just a widget you can use to show the progress of your audio or video player. This widget is easier to connect to a media player than the Flutter Slider widget is. It also supports showing the buffered status for streamed media.*
+
 ## Example
 
 Add the `ProgressBar` widget to your UI. A static example would look like this:
