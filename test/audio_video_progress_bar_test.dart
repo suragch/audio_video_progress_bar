@@ -51,7 +51,8 @@ void main() {
     expect(progressBar.timeLabelLocation, TimeLabelLocation.sides);
   });
 
-  testWidgets('TimeLabelLocation.below size correct', (WidgetTester tester) async {
+  testWidgets('TimeLabelLocation.below size correct',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       Center(
         child: ProgressBar(
@@ -70,7 +71,8 @@ void main() {
     expect(baseSize.height, equals(34.0));
   });
 
-  testWidgets('TimeLabelLocation.sides size correct', (WidgetTester tester) async {
+  testWidgets('TimeLabelLocation.sides size correct',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       Center(
         child: ProgressBar(
@@ -89,7 +91,8 @@ void main() {
     expect(baseSize.height, equals(20.0));
   });
 
-  testWidgets('TimeLabelLocation.none size correct', (WidgetTester tester) async {
+  testWidgets('TimeLabelLocation.none size correct',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       Center(
         child: ProgressBar(
@@ -108,7 +111,8 @@ void main() {
     expect(baseSize.height, equals(20.0));
   });
 
-  testWidgets('ProgressBar default size is TimeLabelLocation.below', (WidgetTester tester) async {
+  testWidgets('ProgressBar default size is TimeLabelLocation.below',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       Center(
         child: ProgressBar(
@@ -126,7 +130,8 @@ void main() {
     expect(baseSize.height, equals(34.0));
   });
 
-  testWidgets('Changing the thumb radius changes the widget size', (WidgetTester tester) async {
+  testWidgets('Changing the thumb radius changes the widget size',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       Center(
         child: ProgressBar(
@@ -146,7 +151,9 @@ void main() {
     expect(baseSize.height, equals(60.0));
   });
 
-  testWidgets('The height is the max of the font and thumb radius for TimeLabelLocation.sides', (WidgetTester tester) async {
+  testWidgets(
+      'The height is the max of the font and thumb radius for TimeLabelLocation.sides',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       Center(
         child: ProgressBar(

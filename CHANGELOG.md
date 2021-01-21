@@ -1,3 +1,7 @@
+## [0.2.0-nullsafety.0] - January 21, 2021
+
+* Updated to null safety
+
 ## [0.1.0] - December 30, 2020
 
 * Initial release

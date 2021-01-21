@@ -77,7 +77,6 @@ class _HomeWidgetState extends State<HomeWidget> {
                   progress: progress,
                   buffered: buffered,
                   total: total,
-                  timeLabelLocation: TimeLabelLocation.sides,
                   onSeek: (duration) {
                     _player.seek(duration);
                   },

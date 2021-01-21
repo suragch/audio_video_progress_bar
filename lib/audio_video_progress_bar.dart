@@ -27,9 +27,9 @@ class ProgressBar extends LeafRenderObjectWidget {
   /// When a user drags the thumb to a new location you can be notified
   /// by the [onSeek] callback so that you can update your audio/video player.
   const ProgressBar({
-    Key key,
-    @required this.progress,
-    @required this.total,
+    Key? key,
+    required this.progress,
+    required this.total,
     this.buffered,
     this.onSeek,
     this.barHeight = 5.0,
@@ -53,7 +53,7 @@ class ProgressBar extends LeafRenderObjectWidget {
   ///
   /// This is useful for streamed content. If you are playing a local file
   /// then you can leave this out.
-  final Duration buffered;
+  final Duration? buffered;
 
   /// A callback when user moves the thumb.
   ///
@@ -62,25 +62,25 @@ class ProgressBar extends LeafRenderObjectWidget {
   ///
   /// You will get the chosen duration to start playing at which you can pass
   /// on to your media player.
-  final ValueChanged<Duration> onSeek;
+  final ValueChanged<Duration>? onSeek;
 
   /// The color of the progress bar before playback has started.
   ///
   /// By default it is a transparent version of your theme's primary color.
-  final Color baseBarColor;
+  final Color? baseBarColor;
 
   /// The color of the progress bar to the left of the current playing
   /// [progress].
   ///
   /// By default it is your theme's primary color.
-  final Color progressBarColor;
+  final Color? progressBarColor;
 
   /// The color of the progress bar between the [progress] location and the
   /// [buffered] location.
   ///
   /// By default it is a transparent version of your theme's primary color,
   /// a shade darker than [baseBarColor].
-  final Color bufferedBarColor;
+  final Color? bufferedBarColor;
 
   /// The vertical thickness of the progress bar.
   final double barHeight;
@@ -91,13 +91,13 @@ class ProgressBar extends LeafRenderObjectWidget {
   /// The color of the circle for the moveable progress bar thumb.
   ///
   /// By default it is your theme's primary color.
-  final Color thumbColor;
+  final Color? thumbColor;
 
   /// The location for the [progress] and [total] duration text labels.
   ///
   /// By default the labels appear under the progress bar but you can also
   /// put them on the sides or remove them altogether.
-  final TimeLabelLocation timeLabelLocation;
+  final TimeLabelLocation? timeLabelLocation;
 
   @override
   _RenderProgressBar createRenderObject(BuildContext context) {
@@ -162,18 +162,18 @@ class ProgressBar extends LeafRenderObjectWidget {
 
 class _RenderProgressBar extends RenderBox {
   _RenderProgressBar({
-    Duration progress,
-    Duration total,
-    Duration buffered,
-    ValueChanged<Duration> onSeek,
-    double barHeight,
-    Color baseBarColor,
-    Color progressBarColor,
-    Color bufferedBarColor,
+    required Duration progress,
+    required Duration total,
+    required Duration buffered,
+    ValueChanged<Duration>? onSeek,
+    required double barHeight,
+    required Color baseBarColor,
+    required Color progressBarColor,
+    required Color bufferedBarColor,
     double thumbRadius = 20.0,
-    Color thumbColor,
-    TimeLabelLocation timeLabelLocation,
-    TextStyle timeLabelTextStyle,
+    required Color thumbColor,
+    required TimeLabelLocation timeLabelLocation,
+    TextStyle? timeLabelTextStyle,
   })  : _progress = progress,
         _total = total,
         _buffered = buffered,
@@ -196,7 +196,7 @@ class _RenderProgressBar extends RenderBox {
   }
 
   // This is the gesture recognizer used to move the thumb.
-  HorizontalDragGestureRecognizer _drag;
+  HorizontalDragGestureRecognizer? _drag;
 
   // This is a value between 0.0 and 1.0 used to indicate the position on
   // the bar.
@@ -219,7 +219,7 @@ class _RenderProgressBar extends RenderBox {
 
   void _onDragEnd(DragEndDetails details) {
     final thumbMiliseconds = _thumbValue * total.inMilliseconds;
-    onSeek(Duration(milliseconds: thumbMiliseconds.round()));
+    onSeek?.call(Duration(milliseconds: thumbMiliseconds.round()));
     _finishDrag();
   }
 
@@ -254,7 +254,7 @@ class _RenderProgressBar extends RenderBox {
   /// This is used to update the thumb value and the left time label.
   Duration get progress => _progress;
   Duration _progress;
-  TextPainter _leftTimeLabel;
+  late TextPainter _leftTimeLabel;
   set progress(Duration value) {
     if (_progress == value) {
       return;
@@ -286,7 +286,7 @@ class _RenderProgressBar extends RenderBox {
   /// The total time length of the media.
   Duration get total => _total;
   Duration _total;
-  TextPainter _rightTimeLabel;
+  late TextPainter _rightTimeLabel;
   set total(Duration value) {
     if (_total == value) {
       return;
@@ -308,9 +308,9 @@ class _RenderProgressBar extends RenderBox {
   }
 
   /// A callback for the audio duration position to where the thumb was moved.
-  ValueChanged<Duration> get onSeek => _onSeek;
-  ValueChanged<Duration> _onSeek;
-  set onSeek(ValueChanged<Duration> value) {
+  ValueChanged<Duration>? get onSeek => _onSeek;
+  ValueChanged<Duration>? _onSeek;
+  set onSeek(ValueChanged<Duration>? value) {
     if (value == _onSeek) {
       return;
     }
@@ -382,9 +382,9 @@ class _RenderProgressBar extends RenderBox {
 
   /// The text style for the duration text labels. By default this style is
   /// taken from the theme's [textStyle.bodyText1].
-  TextStyle get timeLabelTextStyle => _timeLabelTextStyle;
-  TextStyle _timeLabelTextStyle;
-  set timeLabelTextStyle(TextStyle value) {
+  TextStyle? get timeLabelTextStyle => _timeLabelTextStyle;
+  TextStyle? _timeLabelTextStyle;
+  set timeLabelTextStyle(TextStyle? value) {
     if (_timeLabelTextStyle == value) return;
     _timeLabelTextStyle = value;
     markNeedsLayout();
@@ -412,7 +412,7 @@ class _RenderProgressBar extends RenderBox {
   void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
     assert(debugHandleEvent(event, entry));
     if (event is PointerDownEvent) {
-      _drag.addPointer(event);
+      _drag?.addPointer(event);
     }
   }
 
