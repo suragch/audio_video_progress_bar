@@ -1,3 +1,8 @@
+## [0.3.0] - March 7, 2021
+
+* Null safety release version
+* Added `computeDryLayout`
+
 ## [0.2.0-nullsafety.0] - January 21, 2021
 
 * Updated to null safety

@@ -24,9 +24,9 @@ class HomeWidget extends StatefulWidget {
 }
 
 class _HomeWidgetState extends State<HomeWidget> {
-  AudioPlayer _player;
+  late AudioPlayer _player;
   final url = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3';
-  Stream<DurationState> _durationState;
+  late Stream<DurationState> _durationState;
 
   @override
   void initState() {
@@ -126,8 +126,12 @@ class _HomeWidgetState extends State<HomeWidget> {
 }
 
 class DurationState {
-  const DurationState({this.progress, this.buffered, this.total});
+  const DurationState({
+    required this.progress,
+    required this.buffered,
+    this.total,
+  });
   final Duration progress;
   final Duration buffered;
-  final Duration total;
+  final Duration? total;
 }

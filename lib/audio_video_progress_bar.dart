@@ -416,13 +416,17 @@ class _RenderProgressBar extends RenderBox {
     }
   }
 
-  // TODO: Use computeDryLayout instead.
   @override
   void performLayout() {
+    size = computeDryLayout(constraints);
+  }
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) {
     final desiredWidth = constraints.maxWidth;
     final desiredHeight = _calculateDesiredHeight();
     final desiredSize = Size(desiredWidth, desiredHeight);
-    size = constraints.constrain(desiredSize);
+    return constraints.constrain(desiredSize);
   }
 
   // When changing these remember to keep the gesture recognizer for the
