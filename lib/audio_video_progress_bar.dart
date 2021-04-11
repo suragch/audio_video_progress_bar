@@ -163,6 +163,8 @@ class ProgressBar extends LeafRenderObjectWidget {
     properties.add(ColorProperty('thumbColor', thumbColor));
     properties
         .add(StringProperty('timeLabelLocation', timeLabelLocation.toString()));
+    properties
+        .add(DiagnosticsProperty('timeLabelTextStyle', timeLabelTextStyle));
   }
 }
 
