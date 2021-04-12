@@ -11,11 +11,28 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: HomeWidget(),
-    );
+    return ValueListenableBuilder<ThemeVariation>(
+        valueListenable: themeNotifier,
+        builder: (context, value, child) {
+          return MaterialApp(
+            theme: ThemeData(
+              primarySwatch: value.color,
+              brightness: value.brightness
+            ),
+            home: HomeWidget(),
+          );
+        });
   }
+}
+
+var themeNotifier = ValueNotifier<ThemeVariation>(
+  ThemeVariation(Colors.blue, Brightness.dark),
+);
+
+class ThemeVariation {
+  const ThemeVariation(this.color, this.brightness);
+  final MaterialColor color;
+  final Brightness brightness;
 }
 
 class HomeWidget extends StatefulWidget {
@@ -65,6 +82,20 @@ class _HomeWidgetState extends State<HomeWidget> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
+            Wrap(children: [
+              OutlinedButton(
+                child: Text('Light'),
+                onPressed: () {
+                  themeNotifier.value = ThemeVariation(Colors.blue, Brightness.light);
+                },
+              ),
+              OutlinedButton(
+                child: Text('Dark'),
+                onPressed: () {
+                  themeNotifier.value = ThemeVariation(Colors.blue, Brightness.dark);
+                },
+              ),
+            ]),
             Spacer(),
             StreamBuilder<DurationState>(
               stream: _durationState,
