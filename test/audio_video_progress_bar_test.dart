@@ -33,6 +33,7 @@ void main() {
         thumbColor: Color(0x00000000),
         thumbGlowColor: Color(0x00000000),
         timeLabelLocation: TimeLabelLocation.sides,
+        timeLabelTextStyle: const TextStyle(color: Color(0x00000000)),
       ),
     );
 
@@ -51,6 +52,8 @@ void main() {
     expect(progressBar.thumbColor, Color(0x00000000));
     expect(progressBar.thumbGlowColor, Color(0x00000000));
     expect(progressBar.timeLabelLocation, TimeLabelLocation.sides);
+    expect(progressBar.timeLabelTextStyle,
+        const TextStyle(color: Color(0x00000000)));
   });
 
   testWidgets('TimeLabelLocation.below size correct',

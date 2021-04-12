@@ -40,6 +40,7 @@ class ProgressBar extends LeafRenderObjectWidget {
     this.thumbColor,
     this.thumbGlowColor,
     this.timeLabelLocation,
+    this.timeLabelTextStyle,
   }) : super(key: key);
 
   /// The elapsed playing time of the media.
@@ -105,11 +106,16 @@ class ProgressBar extends LeafRenderObjectWidget {
   /// put them on the sides or remove them altogether.
   final TimeLabelLocation? timeLabelLocation;
 
+  /// The [TextStyle] used by the time labels.
+  ///
+  /// By default it is [TextTheme.bodyText1].
+  final TextStyle? timeLabelTextStyle;
+
   @override
   _RenderProgressBar createRenderObject(BuildContext context) {
     final theme = Theme.of(context);
     final primaryColor = theme.colorScheme.primary;
-    final textStyle = theme.textTheme.bodyText1;
+    final textStyle = timeLabelTextStyle ?? theme.textTheme.bodyText1;
     return _RenderProgressBar(
       progress: progress,
       total: total,
@@ -133,7 +139,7 @@ class ProgressBar extends LeafRenderObjectWidget {
       BuildContext context, _RenderProgressBar renderObject) {
     final theme = Theme.of(context);
     final primaryColor = theme.colorScheme.primary;
-    final textStyle = theme.textTheme.bodyText1;
+    final textStyle = timeLabelTextStyle ?? theme.textTheme.bodyText1;
     renderObject
       ..progress = progress
       ..total = total
@@ -168,6 +174,8 @@ class ProgressBar extends LeafRenderObjectWidget {
     properties.add(ColorProperty('thumbGlowColor', thumbGlowColor));
     properties
         .add(StringProperty('timeLabelLocation', timeLabelLocation.toString()));
+    properties
+        .add(DiagnosticsProperty('timeLabelTextStyle', timeLabelTextStyle));
   }
 }
 
@@ -410,6 +418,7 @@ class _RenderProgressBar extends RenderBox {
     if (_timeLabelTextStyle == value) return;
     _timeLabelTextStyle = value;
     markNeedsLayout();
+    markNeedsPaint();
   }
 
   // The smallest that this widget would ever want to be.
