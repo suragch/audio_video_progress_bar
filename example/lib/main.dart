@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
 }
 
 var themeNotifier = ValueNotifier<ThemeVariation>(
-  ThemeVariation(Colors.blue, Brightness.dark),
+  ThemeVariation(Colors.blue, Brightness.light),
 );
 
 class ThemeVariation {
