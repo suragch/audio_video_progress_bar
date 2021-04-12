@@ -39,6 +39,7 @@ class ProgressBar extends LeafRenderObjectWidget {
     this.thumbRadius = 10.0,
     this.thumbColor,
     this.thumbGlowColor,
+    this.thumbGlowRadius = 30.0,
     this.timeLabelLocation,
     this.timeLabelTextStyle,
   }) : super(key: key);
@@ -100,6 +101,12 @@ class ProgressBar extends LeafRenderObjectWidget {
   /// By default it is [thumbColor] with an alpha value of 80.
   final Color? thumbGlowColor;
 
+  /// The radius of the circle for the pressed-down effect of the moveable
+  /// progress bar thumb.
+  ///
+  /// By default it is 30.
+  final double thumbGlowRadius;
+
   /// The location for the [progress] and [total] duration text labels.
   ///
   /// By default the labels appear under the progress bar but you can also
@@ -129,6 +136,7 @@ class ProgressBar extends LeafRenderObjectWidget {
       thumbColor: thumbColor ?? primaryColor,
       thumbGlowColor:
           thumbGlowColor ?? (thumbColor ?? primaryColor).withAlpha(80),
+      thumbGlowRadius: thumbGlowRadius,
       timeLabelLocation: timeLabelLocation ?? TimeLabelLocation.below,
       timeLabelTextStyle: textStyle,
     );
@@ -153,6 +161,7 @@ class ProgressBar extends LeafRenderObjectWidget {
       ..thumbColor = thumbColor ?? primaryColor
       ..thumbGlowColor =
           thumbGlowColor ?? (thumbColor ?? primaryColor).withAlpha(80)
+      ..thumbGlowRadius = thumbGlowRadius
       ..timeLabelLocation = timeLabelLocation ?? TimeLabelLocation.below
       ..timeLabelTextStyle = textStyle;
   }
@@ -172,6 +181,7 @@ class ProgressBar extends LeafRenderObjectWidget {
     properties.add(DoubleProperty('thumbRadius', thumbRadius));
     properties.add(ColorProperty('thumbColor', thumbColor));
     properties.add(ColorProperty('thumbGlowColor', thumbGlowColor));
+    properties.add(DoubleProperty('thumbGlowRadius', thumbGlowRadius));
     properties
         .add(StringProperty('timeLabelLocation', timeLabelLocation.toString()));
     properties
@@ -192,6 +202,7 @@ class _RenderProgressBar extends RenderBox {
     double thumbRadius = 20.0,
     required Color thumbColor,
     required Color thumbGlowColor,
+    double thumbGlowRadius = 30.0,
     required TimeLabelLocation timeLabelLocation,
     TextStyle? timeLabelTextStyle,
   })  : _progress = progress,
@@ -205,6 +216,7 @@ class _RenderProgressBar extends RenderBox {
         _thumbRadius = thumbRadius,
         _thumbColor = thumbColor,
         _thumbGlowColor = thumbGlowColor,
+        _thumbGlowRadius = thumbGlowRadius,
         _timeLabelLocation = timeLabelLocation,
         _timeLabelTextStyle = timeLabelTextStyle {
     _drag = HorizontalDragGestureRecognizer()
@@ -383,6 +395,15 @@ class _RenderProgressBar extends RenderBox {
     markNeedsPaint();
   }
 
+  /// The length of the radius for the circular thumb.
+  double get thumbRadius => _thumbRadius;
+  double _thumbRadius;
+  set thumbRadius(double value) {
+    if (_thumbRadius == value) return;
+    _thumbRadius = value;
+    markNeedsLayout();
+  }
+
   /// The color of the pressed-down effect of the moveable thumb.
   Color get thumbGlowColor => _thumbGlowColor;
   Color _thumbGlowColor;
@@ -392,12 +413,12 @@ class _RenderProgressBar extends RenderBox {
     if (_userIsDraggingThumb) markNeedsPaint();
   }
 
-  /// The length of the radius for the circular thumb.
-  double get thumbRadius => _thumbRadius;
-  double _thumbRadius;
-  set thumbRadius(double value) {
-    if (_thumbRadius == value) return;
-    _thumbRadius = value;
+  /// The length of the radius of the pressed-down effect of the moveable thumb.
+  double get thumbGlowRadius => _thumbGlowRadius;
+  double _thumbGlowRadius;
+  set thumbGlowRadius(double value) {
+    if (_thumbGlowRadius == value) return;
+    _thumbGlowRadius = value;
     markNeedsLayout();
   }
 
@@ -418,7 +439,6 @@ class _RenderProgressBar extends RenderBox {
     if (_timeLabelTextStyle == value) return;
     _timeLabelTextStyle = value;
     markNeedsLayout();
-    markNeedsPaint();
   }
 
   // The smallest that this widget would ever want to be.
@@ -626,7 +646,7 @@ class _RenderProgressBar extends RenderBox {
     final center = Offset(thumbDx, localSize.height / 2);
     if (_userIsDraggingThumb) {
       final thumbGlowPaint = Paint()..color = thumbGlowColor;
-      canvas.drawCircle(center, 30, thumbGlowPaint);
+      canvas.drawCircle(center, thumbGlowRadius, thumbGlowPaint);
     }
     canvas.drawCircle(center, thumbRadius, thumbPaint);
   }
