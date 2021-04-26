@@ -224,8 +224,6 @@ class _RenderProgressBar extends RenderBox {
       ..onUpdate = _onDragUpdate
       ..onEnd = _onDragEnd
       ..onCancel = _finishDrag;
-    _leftTimeLabel = _setTimeLabel(progress);
-    _rightTimeLabel = _setTimeLabel(progress);
   }
 
   // This is the gesture recognizer used to move the thumb.
@@ -270,8 +268,8 @@ class _RenderProgressBar extends RenderBox {
     double barStart;
     double barEnd;
     if (_timeLabelLocation == TimeLabelLocation.sides) {
-      barStart = _leftTimeLabel.width + _thumbRadius;
-      barEnd = size.width - _rightTimeLabel.width - _thumbRadius;
+      barStart = _leftTimeLabel().width + _thumbRadius;
+      barEnd = size.width - _rightTimeLabel().width - _thumbRadius;
     } else {
       barStart = _thumbRadius;
       barEnd = size.width - _thumbRadius;
@@ -287,7 +285,6 @@ class _RenderProgressBar extends RenderBox {
   /// This is used to update the thumb value and the left time label.
   Duration get progress => _progress;
   Duration _progress;
-  late TextPainter _leftTimeLabel;
   set progress(Duration value) {
     if (_progress == value) {
       return;
@@ -295,15 +292,17 @@ class _RenderProgressBar extends RenderBox {
     _progress = value;
     if (!_userIsDraggingThumb) {
       _thumbValue = _proportionOfTotal(value);
-      if (_timeLabelLocation != TimeLabelLocation.none) {
-        _leftTimeLabel = _setTimeLabel(value);
-      }
     }
     markNeedsPaint();
   }
 
-  TextPainter _setTimeLabel(Duration duration) {
-    final text = _getTimeString(duration);
+  TextPainter _leftTimeLabel() {
+    final text = _getTimeString(progress);
+    return _layoutText(text);
+  }
+
+  TextPainter _rightTimeLabel() {
+    final text = _getTimeString(total);
     return _layoutText(text);
   }
 
@@ -319,13 +318,11 @@ class _RenderProgressBar extends RenderBox {
   /// The total time length of the media.
   Duration get total => _total;
   Duration _total;
-  late TextPainter _rightTimeLabel;
   set total(Duration value) {
     if (_total == value) {
       return;
     }
     _total = value;
-    _rightTimeLabel = _setTimeLabel(value);
     markNeedsPaint();
   }
 
@@ -506,7 +503,7 @@ class _RenderProgressBar extends RenderBox {
   }
 
   double _textHeight() {
-    return _leftTimeLabel.height;
+    return _leftTimeLabel().height;
   }
 
   @override
@@ -545,12 +542,14 @@ class _RenderProgressBar extends RenderBox {
 
     // current time label
     final labelOffset = Offset(padding, barHeight);
-    _leftTimeLabel.paint(canvas, labelOffset);
+    final leftTimeLabel = _leftTimeLabel();
+    leftTimeLabel.paint(canvas, labelOffset);
 
     // total time label
-    final rightLabelDx = size.width - padding - _rightTimeLabel.width;
+    final rightTimeLabel = _rightTimeLabel();
+    final rightLabelDx = size.width - padding - rightTimeLabel.width;
     final rightLabelOffset = Offset(rightLabelDx, barHeight);
-    _rightTimeLabel.paint(canvas, rightLabelOffset);
+    _rightTimeLabel().paint(canvas, rightLabelOffset);
 
     // progress bar
     _drawProgressBar(canvas, Offset(padding, 0), Size(barWidth, barHeight));
@@ -565,20 +564,24 @@ class _RenderProgressBar extends RenderBox {
     final padding = _thumbRadius;
     final barHeight = 2 * _thumbRadius;
 
+    // painters
+    final leftTimeLabel = _leftTimeLabel();
+    final rightTimeLabel = _rightTimeLabel();
+
     // current time label
-    final verticalOffset = size.height / 2 - _leftTimeLabel.height / 2;
+    final verticalOffset = size.height / 2 - leftTimeLabel.height / 2;
     final currentLabelOffset = Offset(0, verticalOffset);
-    _leftTimeLabel.paint(canvas, currentLabelOffset);
+    leftTimeLabel.paint(canvas, currentLabelOffset);
 
     // total time label
-    final totalLabelDx = size.width - _rightTimeLabel.width;
+    final totalLabelDx = size.width - rightTimeLabel.width;
     final totalLabelOffset = Offset(totalLabelDx, verticalOffset);
-    _rightTimeLabel.paint(canvas, totalLabelOffset);
+    rightTimeLabel.paint(canvas, totalLabelOffset);
 
     // progress bar
-    final leftLabelWidth = _leftTimeLabel.width;
+    final leftLabelWidth = leftTimeLabel.width;
     final barWidth =
-        size.width - 2 * padding - leftLabelWidth - _rightTimeLabel.width;
+        size.width - 2 * padding - leftLabelWidth - rightTimeLabel.width;
     _drawProgressBar(
       canvas,
       Offset(padding + leftLabelWidth, 0),

@@ -1,3 +1,13 @@
+## [0.3.2] - April 26, 2021
+
+* Fixed bug with failure to update label color on theme change.
+
+## [0.3.1] - April 12, 2021
+
+* Added `thumbGlowColor`
+* Added `thumbGlowRadius`
+* Added `timeLabelTextStyle`
+
 ## [0.3.0] - March 7, 2021
 
 * Null safety release version
