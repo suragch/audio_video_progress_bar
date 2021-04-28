@@ -42,6 +42,7 @@ class ProgressBar extends LeafRenderObjectWidget {
     this.thumbGlowRadius = 30.0,
     this.timeLabelLocation,
     this.timeLabelTextStyle,
+    this.showTimeLeft = false,
   }) : super(key: key);
 
   /// The elapsed playing time of the media.
@@ -118,6 +119,11 @@ class ProgressBar extends LeafRenderObjectWidget {
   /// By default it is [TextTheme.bodyText1].
   final TextStyle? timeLabelTextStyle;
 
+  /// The showTimeLeft will show the time left when this is true
+  ///
+  /// By default it is false.
+  final bool showTimeLeft;
+
   @override
   _RenderProgressBar createRenderObject(BuildContext context) {
     final theme = Theme.of(context);
@@ -134,17 +140,16 @@ class ProgressBar extends LeafRenderObjectWidget {
       bufferedBarColor: bufferedBarColor ?? primaryColor.withOpacity(0.24),
       thumbRadius: thumbRadius,
       thumbColor: thumbColor ?? primaryColor,
-      thumbGlowColor:
-          thumbGlowColor ?? (thumbColor ?? primaryColor).withAlpha(80),
+      thumbGlowColor: thumbGlowColor ?? (thumbColor ?? primaryColor).withAlpha(80),
       thumbGlowRadius: thumbGlowRadius,
       timeLabelLocation: timeLabelLocation ?? TimeLabelLocation.below,
       timeLabelTextStyle: textStyle,
+      showTimeLeft: showTimeLeft,
     );
   }
 
   @override
-  void updateRenderObject(
-      BuildContext context, _RenderProgressBar renderObject) {
+  void updateRenderObject(BuildContext context, _RenderProgressBar renderObject) {
     final theme = Theme.of(context);
     final primaryColor = theme.colorScheme.primary;
     final textStyle = timeLabelTextStyle ?? theme.textTheme.bodyText1;
@@ -159,8 +164,7 @@ class ProgressBar extends LeafRenderObjectWidget {
       ..bufferedBarColor = bufferedBarColor ?? primaryColor.withOpacity(0.24)
       ..thumbRadius = thumbRadius
       ..thumbColor = thumbColor ?? primaryColor
-      ..thumbGlowColor =
-          thumbGlowColor ?? (thumbColor ?? primaryColor).withAlpha(80)
+      ..thumbGlowColor = thumbGlowColor ?? (thumbColor ?? primaryColor).withAlpha(80)
       ..thumbGlowRadius = thumbGlowRadius
       ..timeLabelLocation = timeLabelLocation ?? TimeLabelLocation.below
       ..timeLabelTextStyle = textStyle;
@@ -172,8 +176,7 @@ class ProgressBar extends LeafRenderObjectWidget {
     properties.add(StringProperty('progress', progress.toString()));
     properties.add(StringProperty('total', total.toString()));
     properties.add(StringProperty('buffered', buffered.toString()));
-    properties.add(ObjectFlagProperty<ValueChanged<Duration>>('onSeek', onSeek,
-        ifNull: 'unimplemented'));
+    properties.add(ObjectFlagProperty<ValueChanged<Duration>>('onSeek', onSeek, ifNull: 'unimplemented'));
     properties.add(DoubleProperty('barHeight', barHeight));
     properties.add(ColorProperty('baseBarColor', baseBarColor));
     properties.add(ColorProperty('progressBarColor', progressBarColor));
@@ -182,10 +185,8 @@ class ProgressBar extends LeafRenderObjectWidget {
     properties.add(ColorProperty('thumbColor', thumbColor));
     properties.add(ColorProperty('thumbGlowColor', thumbGlowColor));
     properties.add(DoubleProperty('thumbGlowRadius', thumbGlowRadius));
-    properties
-        .add(StringProperty('timeLabelLocation', timeLabelLocation.toString()));
-    properties
-        .add(DiagnosticsProperty('timeLabelTextStyle', timeLabelTextStyle));
+    properties.add(StringProperty('timeLabelLocation', timeLabelLocation.toString()));
+    properties.add(DiagnosticsProperty('timeLabelTextStyle', timeLabelTextStyle));
   }
 }
 
@@ -204,6 +205,7 @@ class _RenderProgressBar extends RenderBox {
     required Color thumbGlowColor,
     double thumbGlowRadius = 30.0,
     required TimeLabelLocation timeLabelLocation,
+    required showTimeLeft,
     TextStyle? timeLabelTextStyle,
   })  : _progress = progress,
         _total = total,
@@ -218,7 +220,8 @@ class _RenderProgressBar extends RenderBox {
         _thumbGlowColor = thumbGlowColor,
         _thumbGlowRadius = thumbGlowRadius,
         _timeLabelLocation = timeLabelLocation,
-        _timeLabelTextStyle = timeLabelTextStyle {
+        _timeLabelTextStyle = timeLabelTextStyle,
+        _showTimeLeft = showTimeLeft {
     _drag = HorizontalDragGestureRecognizer()
       ..onStart = _onDragStart
       ..onUpdate = _onDragUpdate
@@ -238,6 +241,8 @@ class _RenderProgressBar extends RenderBox {
   // track of that so that while the user is dragging the thumb at the same
   // time as a [progress] update there won't be a conflict.
   bool _userIsDraggingThumb = false;
+
+  bool _showTimeLeft;
 
   void _onDragStart(DragStartDetails details) {
     _userIsDraggingThumb = true;
@@ -302,7 +307,7 @@ class _RenderProgressBar extends RenderBox {
   }
 
   TextPainter _rightTimeLabel() {
-    final text = _getTimeString(total);
+    final text = _showTimeLeft ? _getTimeLeftString(progress - total) : _getTimeString(total);
     return _layoutText(text);
   }
 
@@ -580,8 +585,7 @@ class _RenderProgressBar extends RenderBox {
 
     // progress bar
     final leftLabelWidth = leftTimeLabel.width;
-    final barWidth =
-        size.width - 2 * padding - leftLabelWidth - rightTimeLabel.width;
+    final barWidth = size.width - 2 * padding - leftLabelWidth - rightTimeLabel.width;
     _drawProgressBar(
       canvas,
       Offset(padding + leftLabelWidth, 0),
@@ -663,16 +667,23 @@ class _RenderProgressBar extends RenderBox {
   }
 
   String _getTimeString(Duration time) {
-    final minutes = time.inMinutes
-        .remainder(Duration.minutesPerHour)
-        .toString()
-        .padLeft(2, '0');
-    final seconds = time.inSeconds
-        .remainder(Duration.secondsPerMinute)
-        .toString()
-        .padLeft(2, '0');
+    final minutes = time.inMinutes.remainder(Duration.minutesPerHour).toString().padLeft(2, '0');
+    final seconds = time.inSeconds.remainder(Duration.secondsPerMinute).toString().padLeft(2, '0');
     final hours = total.inHours > 0 ? '${time.inHours}:' : '';
     return "$hours$minutes:$seconds";
+  }
+
+  String _getTimeLeftString(Duration time) {
+    time = time.abs();
+
+    final seconds = time.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final minutes = time.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final hours = time.inHours.toString().padLeft(2, '0');
+
+    if (time.inHours > 0)
+      return '$hours:$minutes:$seconds';
+    else
+      return '$minutes:$seconds';
   }
 
   @override

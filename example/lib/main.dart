@@ -15,10 +15,7 @@ class MyApp extends StatelessWidget {
         valueListenable: themeNotifier,
         builder: (context, value, child) {
           return MaterialApp(
-            theme: ThemeData(
-              primarySwatch: value.color,
-              brightness: value.brightness
-            ),
+            theme: ThemeData(primarySwatch: value.color, brightness: value.brightness),
             home: HomeWidget(),
           );
         });
@@ -108,6 +105,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                   progress: progress,
                   buffered: buffered,
                   total: total,
+                  showTimeLeft: true,
                   onSeek: (duration) {
                     _player.seek(duration);
                   },
@@ -120,8 +118,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                 final playerState = snapshot.data;
                 final processingState = playerState?.processingState;
                 final playing = playerState?.playing;
-                if (processingState == ProcessingState.loading ||
-                    processingState == ProcessingState.buffering) {
+                if (processingState == ProcessingState.loading || processingState == ProcessingState.buffering) {
                   return Container(
                     margin: EdgeInsets.all(8.0),
                     width: 32.0,
