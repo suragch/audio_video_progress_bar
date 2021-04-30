@@ -656,6 +656,7 @@ class _RenderProgressBar extends RenderBox {
   void _drawBaseBar(Canvas canvas, Size localSize) {
     final baseBarPaint = Paint()
       ..color = baseBarColor
+      ..strokeCap = StrokeCap.round
       ..strokeWidth = barHeight;
     final startPoint = Offset(0, localSize.height / 2);
     var endPoint = Offset(localSize.width, localSize.height / 2);
@@ -665,6 +666,7 @@ class _RenderProgressBar extends RenderBox {
   void _drawBufferedBar(Canvas canvas, Size localSize) {
     final bufferedBarPaint = Paint()
       ..color = bufferedBarColor
+      ..strokeCap = StrokeCap.round
       ..strokeWidth = barHeight;
     final bufferedWidth = _proportionOfTotal(_buffered) * localSize.width;
     final startPoint = Offset(0, localSize.height / 2);
@@ -675,6 +677,7 @@ class _RenderProgressBar extends RenderBox {
   void _drawCurrentProgressBar(Canvas canvas, Size localSize) {
     final progressBarPaint = Paint()
       ..color = progressBarColor
+      ..strokeCap = StrokeCap.round
       ..strokeWidth = barHeight;
     final progressWidth = _proportionOfTotal(_progress) * localSize.width;
     final startPoint = Offset(0, localSize.height / 2);
