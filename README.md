@@ -110,4 +110,4 @@ Now the time labels are displayed on the side:
 
 If your interested in how this widget was made, check out the article [Creating a Flutter widget from scratch](https://suragch.medium.com/creating-a-flutter-widget-from-scratch-a9c01c47c630).
 
-Please open an issue if you find any bugs.
+Please [open an issue](https://github.com/suragch/audio_video_progress_bar/issues) if you find any bugs.
