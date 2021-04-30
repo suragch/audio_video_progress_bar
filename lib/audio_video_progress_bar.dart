@@ -13,6 +13,14 @@ enum TimeLabelLocation {
   none,
 }
 
+/// The right time label can be shown as the [totalTime] or as the
+/// [remainingTime]. If the choice is [remainingTime] then this will be shown
+/// as a negative number.
+enum TimeLabelType {
+  totalTime,
+  remainingTime,
+}
+
 /// A progress bar widget to show or set the location of the currently
 /// playing audio or video content.
 ///
@@ -41,6 +49,7 @@ class ProgressBar extends LeafRenderObjectWidget {
     this.thumbGlowColor,
     this.thumbGlowRadius = 30.0,
     this.timeLabelLocation,
+    this.timeLabelType,
     this.timeLabelTextStyle,
   }) : super(key: key);
 
@@ -113,6 +122,12 @@ class ProgressBar extends LeafRenderObjectWidget {
   /// put them on the sides or remove them altogether.
   final TimeLabelLocation? timeLabelLocation;
 
+  /// What to display for the time label on the right
+  ///
+  /// The right time label can show the total time or the remaining time as a
+  /// negative number. The default is [TimeLabelType.totalTime].
+  final TimeLabelType? timeLabelType;
+
   /// The [TextStyle] used by the time labels.
   ///
   /// By default it is [TextTheme.bodyText1].
@@ -138,6 +153,7 @@ class ProgressBar extends LeafRenderObjectWidget {
           thumbGlowColor ?? (thumbColor ?? primaryColor).withAlpha(80),
       thumbGlowRadius: thumbGlowRadius,
       timeLabelLocation: timeLabelLocation ?? TimeLabelLocation.below,
+      timeLabelType: timeLabelType ?? TimeLabelType.totalTime,
       timeLabelTextStyle: textStyle,
     );
   }
@@ -163,6 +179,7 @@ class ProgressBar extends LeafRenderObjectWidget {
           thumbGlowColor ?? (thumbColor ?? primaryColor).withAlpha(80)
       ..thumbGlowRadius = thumbGlowRadius
       ..timeLabelLocation = timeLabelLocation ?? TimeLabelLocation.below
+      ..timeLabelType = timeLabelType ?? TimeLabelType.totalTime
       ..timeLabelTextStyle = textStyle;
   }
 
@@ -184,6 +201,7 @@ class ProgressBar extends LeafRenderObjectWidget {
     properties.add(DoubleProperty('thumbGlowRadius', thumbGlowRadius));
     properties
         .add(StringProperty('timeLabelLocation', timeLabelLocation.toString()));
+    properties.add(StringProperty('timeLabelType', timeLabelType.toString()));
     properties
         .add(DiagnosticsProperty('timeLabelTextStyle', timeLabelTextStyle));
   }
@@ -204,6 +222,7 @@ class _RenderProgressBar extends RenderBox {
     required Color thumbGlowColor,
     double thumbGlowRadius = 30.0,
     required TimeLabelLocation timeLabelLocation,
+    required TimeLabelType timeLabelType,
     TextStyle? timeLabelTextStyle,
   })  : _progress = progress,
         _total = total,
@@ -218,6 +237,7 @@ class _RenderProgressBar extends RenderBox {
         _thumbGlowColor = thumbGlowColor,
         _thumbGlowRadius = thumbGlowRadius,
         _timeLabelLocation = timeLabelLocation,
+        _timeLabelType = timeLabelType,
         _timeLabelTextStyle = timeLabelTextStyle {
     _drag = HorizontalDragGestureRecognizer()
       ..onStart = _onDragStart
@@ -302,8 +322,15 @@ class _RenderProgressBar extends RenderBox {
   }
 
   TextPainter _rightTimeLabel() {
-    final text = _getTimeString(total);
-    return _layoutText(text);
+    switch (timeLabelType) {
+      case TimeLabelType.totalTime:
+        final text = _getTimeString(total);
+        return _layoutText(text);
+      case TimeLabelType.remainingTime:
+        final remaining = total - progress;
+        final text = '-${_getTimeString(remaining)}';
+        return _layoutText(text);
+    }
   }
 
   TextPainter _layoutText(String text) {
@@ -428,6 +455,18 @@ class _RenderProgressBar extends RenderBox {
     markNeedsLayout();
   }
 
+  /// What to display for the time label on the right
+  ///
+  /// The right time label can show the total time or the remaining time as a
+  /// negative number. The default is [TimeLabelType.totalTime].
+  TimeLabelType get timeLabelType => _timeLabelType;
+  TimeLabelType _timeLabelType;
+  set timeLabelType(TimeLabelType value) {
+    if (_timeLabelType == value) return;
+    _timeLabelType = value;
+    markNeedsLayout();
+  }
+
   /// The text style for the duration text labels. By default this style is
   /// taken from the theme's [textStyle.bodyText1].
   TextStyle? get timeLabelTextStyle => _timeLabelTextStyle;
@@ -545,7 +584,7 @@ class _RenderProgressBar extends RenderBox {
     final leftTimeLabel = _leftTimeLabel();
     leftTimeLabel.paint(canvas, labelOffset);
 
-    // total time label
+    // total or remaining time label
     final rightTimeLabel = _rightTimeLabel();
     final rightLabelDx = size.width - padding - rightTimeLabel.width;
     final rightLabelOffset = Offset(rightLabelDx, barHeight);
@@ -573,7 +612,7 @@ class _RenderProgressBar extends RenderBox {
     final currentLabelOffset = Offset(0, verticalOffset);
     leftTimeLabel.paint(canvas, currentLabelOffset);
 
-    // total time label
+    // total or remaining time label
     final totalLabelDx = size.width - rightTimeLabel.width;
     final totalLabelOffset = Offset(totalLabelDx, verticalOffset);
     rightTimeLabel.paint(canvas, totalLabelOffset);

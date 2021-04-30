@@ -1,3 +1,7 @@
+## [0.4.0] - April 30, 2021
+
+* Added `timeLabelType` as a `TimeLabelType` enum with values of `totalTime` and `remainingTime`, which shows the time left as a negative number.
+
 ## [0.3.2] - April 26, 2021
 
 * Fixed bug with failure to update label color on theme change.
