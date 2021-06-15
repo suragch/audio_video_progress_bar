@@ -1,4 +1,4 @@
-## [0.4.0] - April 30, 2021
+## [0.4.0] - May 1, 2021
 
 * Added `timeLabelType` as a `TimeLabelType` enum with values of `totalTime` and `remainingTime`, which shows the time left as a negative number.
 * Used a rounded stroke cap for the bars.
