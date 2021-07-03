@@ -9,7 +9,7 @@ import 'package:flutter/rendering.dart';
 /// relation to the progress bar.
 enum TimeLabelLocation {
   below,
-  over,
+  above,
   sides,
   none,
 }
@@ -522,8 +522,8 @@ class _RenderProgressBar extends RenderBox {
   double _calculateDesiredHeight() {
     switch (_timeLabelLocation) {
       case TimeLabelLocation.below:
-      case TimeLabelLocation.over:
-        return _heightWhenLabelsBelow();
+      case TimeLabelLocation.above:
+        return _heightWhenLabelsBelowOrAbove();
       case TimeLabelLocation.sides:
         return _heightWhenLabelsOnSides();
       default:
@@ -531,7 +531,7 @@ class _RenderProgressBar extends RenderBox {
     }
   }
 
-  double _heightWhenLabelsBelow() {
+  double _heightWhenLabelsBelowOrAbove() {
     return _heightWhenNoLabels() + _textHeight();
   }
 
@@ -560,8 +560,8 @@ class _RenderProgressBar extends RenderBox {
       case TimeLabelLocation.below:
         _drawProgressBarWithLabelsBelow(canvas);
         break;
-        case TimeLabelLocation.over:
-        _drawProgressBarWithLabelsOver(canvas);
+        case TimeLabelLocation.above:
+        _drawProgressBarWithLabelsAbove(canvas);
         break;
       case TimeLabelLocation.sides:
         _drawProgressBarWithLabelsOnSides(canvas);
@@ -604,7 +604,7 @@ class _RenderProgressBar extends RenderBox {
   ///  | 01:23              05:00 |
   ///  | -------O---------------- |
   ///
-  void _drawProgressBarWithLabelsOver(Canvas canvas) {
+  void _drawProgressBarWithLabelsAbove(Canvas canvas) {
     // calculate sizes
     final padding = _thumbRadius;
     final barWidth = size.width - 2 * padding;
