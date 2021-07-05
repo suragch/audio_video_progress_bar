@@ -120,6 +120,12 @@ class _HomeWidgetState extends State<HomeWidget> {
         },
       ),
       OutlinedButton(
+        child: Text('above'),
+        onPressed: () {
+          setState(() => _labelLocation = TimeLabelLocation.above);
+        },
+      ),
+      OutlinedButton(
         child: Text('sides'),
         onPressed: () {
           setState(() => _labelLocation = TimeLabelLocation.sides);

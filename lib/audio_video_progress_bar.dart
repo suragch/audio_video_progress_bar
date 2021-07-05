@@ -9,6 +9,7 @@ import 'package:flutter/rendering.dart';
 /// relation to the progress bar.
 enum TimeLabelLocation {
   below,
+  above,
   sides,
   none,
 }
@@ -521,7 +522,8 @@ class _RenderProgressBar extends RenderBox {
   double _calculateDesiredHeight() {
     switch (_timeLabelLocation) {
       case TimeLabelLocation.below:
-        return _heightWhenLabelsBelow();
+      case TimeLabelLocation.above:
+        return _heightWhenLabelsBelowOrAbove();
       case TimeLabelLocation.sides:
         return _heightWhenLabelsOnSides();
       default:
@@ -529,7 +531,7 @@ class _RenderProgressBar extends RenderBox {
     }
   }
 
-  double _heightWhenLabelsBelow() {
+  double _heightWhenLabelsBelowOrAbove() {
     return _heightWhenNoLabels() + _textHeight();
   }
 
@@ -557,6 +559,9 @@ class _RenderProgressBar extends RenderBox {
     switch (_timeLabelLocation) {
       case TimeLabelLocation.below:
         _drawProgressBarWithLabelsBelow(canvas);
+        break;
+        case TimeLabelLocation.above:
+        _drawProgressBarWithLabelsAbove(canvas);
         break;
       case TimeLabelLocation.sides:
         _drawProgressBarWithLabelsOnSides(canvas);
@@ -592,6 +597,32 @@ class _RenderProgressBar extends RenderBox {
 
     // progress bar
     _drawProgressBar(canvas, Offset(padding, 0), Size(barWidth, barHeight));
+  }
+
+  ///  Draw the progress bar and labels in the following locations:
+  ///  
+  ///  | 01:23              05:00 |
+  ///  | -------O---------------- |
+  ///
+  void _drawProgressBarWithLabelsAbove(Canvas canvas) {
+    // calculate sizes
+    final padding = _thumbRadius;
+    final barWidth = size.width - 2 * padding;
+    final barHeight = _thumbRadius;
+
+    // current time label
+    final labelOffset = Offset(padding, -barHeight * 1.5);
+    final leftTimeLabel = _leftTimeLabel();
+    leftTimeLabel.paint(canvas, labelOffset);
+
+    // total or remaining time label
+    final rightTimeLabel = _rightTimeLabel();
+    final rightLabelDx = size.width - padding - rightTimeLabel.width;
+    final rightLabelOffset = Offset(rightLabelDx, -barHeight * 1.5);
+    _rightTimeLabel().paint(canvas, rightLabelOffset);
+
+    // progress bar
+    _drawProgressBar(canvas, Offset(padding, padding * 2), Size(barWidth, barHeight));
   }
 
   ///  Draw the progress bar and labels in the following locations:

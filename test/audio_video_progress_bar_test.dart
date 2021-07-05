@@ -80,6 +80,26 @@ void main() {
     expect(baseSize.height, equals(34.0));
   });
 
+  testWidgets('TimeLabelLocation.above size correct',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      Center(
+        child: ProgressBar(
+          progress: Duration.zero,
+          total: Duration(minutes: 5),
+          timeLabelLocation: TimeLabelLocation.above,
+        ),
+      ),
+    );
+
+    ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
+    expect(progressBar, isNotNull);
+
+    final baseSize = tester.getSize(find.byType(ProgressBar));
+    expect(baseSize.width, equals(800.0));
+    expect(baseSize.height, equals(34.0));
+  });
+
   testWidgets('TimeLabelLocation.sides size correct',
       (WidgetTester tester) async {
     await tester.pumpWidget(
