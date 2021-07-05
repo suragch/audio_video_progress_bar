@@ -183,10 +183,17 @@ class _HomeWidgetState extends State<HomeWidget> {
         },
       ),
       OutlinedButton(
-        child: Text('large label'),
+        child: Text('large'),
         onPressed: () {
           setState(
               () => _labelStyle = TextStyle(fontSize: 40, color: fontColor));
+        },
+      ),
+      OutlinedButton(
+        child: Text('small'),
+        onPressed: () {
+          setState(
+              () => _labelStyle = TextStyle(fontSize: 8, color: fontColor));
         },
       ),
     ]);

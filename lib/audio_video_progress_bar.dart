@@ -662,9 +662,10 @@ class _RenderProgressBar extends RenderBox {
     final leftLabelWidth = leftTimeLabel.width;
     final barWidth =
         size.width - 2 * padding - leftLabelWidth - rightTimeLabel.width;
+    final barDy = size.height / 2 - barHeight / 2;
     _drawProgressBar(
       canvas,
-      Offset(padding + leftLabelWidth, 0),
+      Offset(padding + leftLabelWidth, barDy),
       Size(barWidth, barHeight),
     );
   }
