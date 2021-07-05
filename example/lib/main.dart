@@ -18,10 +18,11 @@ import 'package:rxdart/rxdart.dart';
 /// under various situations. Do a seach for "ProgressBar" to find it below.
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeVariation>(
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           theme: ThemeData(
               primarySwatch: value.color, brightness: value.brightness),
-          home: HomeWidget(),
+          home: const HomeWidget(),
         );
       },
     );
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
 }
 
 var themeNotifier = ValueNotifier<ThemeVariation>(
-  ThemeVariation(Colors.blue, Brightness.light),
+  const ThemeVariation(Colors.blue, Brightness.light),
 );
 
 class ThemeVariation {
@@ -48,6 +49,7 @@ class ThemeVariation {
 }
 
 class HomeWidget extends StatefulWidget {
+  const HomeWidget({Key? key}) : super(key: key);
   @override
   _HomeWidgetState createState() => _HomeWidgetState();
 }
@@ -58,7 +60,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   late Stream<DurationState> _durationState;
   var _labelLocation = TimeLabelLocation.below;
   var _labelType = TimeLabelType.totalTime;
-  TextStyle? _labelStyle = null;
+  TextStyle? _labelStyle;
 
   @override
   void initState() {
@@ -79,7 +81,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     try {
       await _player.setUrl(url);
     } catch (e) {
-      print("An error occured $e");
+      debugPrint('An error occured $e');
     }
   }
 
@@ -91,7 +93,7 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print("building app");
+    debugPrint('building app');
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -101,7 +103,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             _labelLocationButtons(),
             _labelTypeButtons(),
             _labelSizeButtons(),
-            Spacer(),
+            const Spacer(),
             _progressBar(),
             _playButton(),
           ],
@@ -113,15 +115,17 @@ class _HomeWidgetState extends State<HomeWidget> {
   Wrap _themeButtons() {
     return Wrap(children: [
       OutlinedButton(
-        child: Text('light'),
+        child: const Text('light'),
         onPressed: () {
-          themeNotifier.value = ThemeVariation(Colors.blue, Brightness.light);
+          themeNotifier.value =
+              const ThemeVariation(Colors.blue, Brightness.light);
         },
       ),
       OutlinedButton(
-        child: Text('dark'),
+        child: const Text('dark'),
         onPressed: () {
-          themeNotifier.value = ThemeVariation(Colors.blue, Brightness.dark);
+          themeNotifier.value =
+              const ThemeVariation(Colors.blue, Brightness.dark);
         },
       ),
     ]);
@@ -130,25 +134,25 @@ class _HomeWidgetState extends State<HomeWidget> {
   Wrap _labelLocationButtons() {
     return Wrap(children: [
       OutlinedButton(
-        child: Text('below'),
+        child: const Text('below'),
         onPressed: () {
           setState(() => _labelLocation = TimeLabelLocation.below);
         },
       ),
       OutlinedButton(
-        child: Text('above'),
+        child: const Text('above'),
         onPressed: () {
           setState(() => _labelLocation = TimeLabelLocation.above);
         },
       ),
       OutlinedButton(
-        child: Text('sides'),
+        child: const Text('sides'),
         onPressed: () {
           setState(() => _labelLocation = TimeLabelLocation.sides);
         },
       ),
       OutlinedButton(
-        child: Text('none'),
+        child: const Text('none'),
         onPressed: () {
           setState(() => _labelLocation = TimeLabelLocation.none);
         },
@@ -159,13 +163,13 @@ class _HomeWidgetState extends State<HomeWidget> {
   Wrap _labelTypeButtons() {
     return Wrap(children: [
       OutlinedButton(
-        child: Text('total time'),
+        child: const Text('total time'),
         onPressed: () {
           setState(() => _labelType = TimeLabelType.totalTime);
         },
       ),
       OutlinedButton(
-        child: Text('remaining time'),
+        child: const Text('remaining time'),
         onPressed: () {
           setState(() => _labelType = TimeLabelType.remainingTime);
         },
@@ -177,20 +181,20 @@ class _HomeWidgetState extends State<HomeWidget> {
     final fontColor = Theme.of(context).textTheme.bodyText1?.color;
     return Wrap(children: [
       OutlinedButton(
-        child: Text('standard label size'),
+        child: const Text('standard label size'),
         onPressed: () {
           setState(() => _labelStyle = null);
         },
       ),
       OutlinedButton(
-        child: Text('large'),
+        child: const Text('large'),
         onPressed: () {
           setState(
               () => _labelStyle = TextStyle(fontSize: 40, color: fontColor));
         },
       ),
       OutlinedButton(
-        child: Text('small'),
+        child: const Text('small'),
         onPressed: () {
           setState(
               () => _labelStyle = TextStyle(fontSize: 8, color: fontColor));
@@ -232,26 +236,26 @@ class _HomeWidgetState extends State<HomeWidget> {
         if (processingState == ProcessingState.loading ||
             processingState == ProcessingState.buffering) {
           return Container(
-            margin: EdgeInsets.all(8.0),
+            margin: const EdgeInsets.all(8.0),
             width: 32.0,
             height: 32.0,
-            child: CircularProgressIndicator(),
+            child: const CircularProgressIndicator(),
           );
         } else if (playing != true) {
           return IconButton(
-            icon: Icon(Icons.play_arrow),
+            icon: const Icon(Icons.play_arrow),
             iconSize: 32.0,
             onPressed: _player.play,
           );
         } else if (processingState != ProcessingState.completed) {
           return IconButton(
-            icon: Icon(Icons.pause),
+            icon: const Icon(Icons.pause),
             iconSize: 32.0,
             onPressed: _player.pause,
           );
         } else {
           return IconButton(
-            icon: Icon(Icons.replay),
+            icon: const Icon(Icons.replay),
             iconSize: 32.0,
             onPressed: () => _player.seek(Duration.zero),
           );

@@ -1,6 +1,12 @@
+## [0.5.0] - July 5, 2021
+
+* Added `TimeLabelLocation.above` (@Groseuros)
+* Center the progress bar vertically when bar hight is less than text height for `TimeLabelLocation.sides`
+* Added `flutter_lints` linting
+
 ## [0.4.0] - May 1, 2021
 
-* Added `timeLabelType` as a `TimeLabelType` enum with values of `totalTime` and `remainingTime`, which shows the time left as a negative number.
+* Added `timeLabelType` as a `TimeLabelType` enum with values of `totalTime` and `remainingTime`, which shows the time left as a negative number. (@tomassasovsky)
 * Used a rounded stroke cap for the bars.
 
 ## [0.3.2] - April 26, 2021
@@ -9,9 +15,9 @@
 
 ## [0.3.1] - April 12, 2021
 
-* Added `thumbGlowColor`
-* Added `thumbGlowRadius`
-* Added `timeLabelTextStyle`
+* Added `thumbGlowColor` (@hacker1024)
+* Added `thumbGlowRadius` (@hacker1024)
+* Added `timeLabelTextStyle` (@hacker1024)
 
 ## [0.3.0] - March 7, 2021
 

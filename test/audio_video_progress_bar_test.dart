@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   testWidgets('ProgressBar widget exists', (WidgetTester tester) async {
     await tester.pumpWidget(
-      ProgressBar(
+      const ProgressBar(
         progress: Duration.zero,
         total: Duration(minutes: 5),
       ),
@@ -22,16 +22,16 @@ void main() {
     await tester.pumpWidget(
       ProgressBar(
         progress: Duration.zero,
-        total: Duration(minutes: 5),
-        buffered: Duration(minutes: 1),
+        total: const Duration(minutes: 5),
+        buffered: const Duration(minutes: 1),
         onSeek: (duration) {},
         barHeight: 2.0,
-        baseBarColor: Color(0x00000000),
-        progressBarColor: Color(0x00000000),
-        bufferedBarColor: Color(0x00000000),
+        baseBarColor: const Color(0x00000000),
+        progressBarColor: const Color(0x00000000),
+        bufferedBarColor: const Color(0x00000000),
         thumbRadius: 20.0,
-        thumbColor: Color(0x00000000),
-        thumbGlowColor: Color(0x00000000),
+        thumbColor: const Color(0x00000000),
+        thumbGlowColor: const Color(0x00000000),
         thumbGlowRadius: 50.0,
         timeLabelLocation: TimeLabelLocation.sides,
         timeLabelType: TimeLabelType.remainingTime,
@@ -43,16 +43,16 @@ void main() {
     expect(progressBar, isNotNull);
 
     expect(progressBar.progress, Duration.zero);
-    expect(progressBar.total, Duration(minutes: 5));
-    expect(progressBar.buffered, Duration(minutes: 1));
+    expect(progressBar.total, const Duration(minutes: 5));
+    expect(progressBar.buffered, const Duration(minutes: 1));
     expect(progressBar.onSeek, isNotNull);
     expect(progressBar.barHeight, 2.0);
-    expect(progressBar.baseBarColor, Color(0x00000000));
-    expect(progressBar.progressBarColor, Color(0x00000000));
-    expect(progressBar.bufferedBarColor, Color(0x00000000));
+    expect(progressBar.baseBarColor, const Color(0x00000000));
+    expect(progressBar.progressBarColor, const Color(0x00000000));
+    expect(progressBar.bufferedBarColor, const Color(0x00000000));
     expect(progressBar.thumbRadius, 20.0);
-    expect(progressBar.thumbColor, Color(0x00000000));
-    expect(progressBar.thumbGlowColor, Color(0x00000000));
+    expect(progressBar.thumbColor, const Color(0x00000000));
+    expect(progressBar.thumbGlowColor, const Color(0x00000000));
     expect(progressBar.thumbGlowRadius, 50.0);
     expect(progressBar.timeLabelLocation, TimeLabelLocation.sides);
     expect(progressBar.timeLabelType, TimeLabelType.remainingTime);
@@ -63,7 +63,7 @@ void main() {
   testWidgets('TimeLabelLocation.below size correct',
       (WidgetTester tester) async {
     await tester.pumpWidget(
-      Center(
+      const Center(
         child: ProgressBar(
           progress: Duration.zero,
           total: Duration(minutes: 5),
@@ -83,7 +83,7 @@ void main() {
   testWidgets('TimeLabelLocation.above size correct',
       (WidgetTester tester) async {
     await tester.pumpWidget(
-      Center(
+      const Center(
         child: ProgressBar(
           progress: Duration.zero,
           total: Duration(minutes: 5),
@@ -103,7 +103,7 @@ void main() {
   testWidgets('TimeLabelLocation.sides size correct',
       (WidgetTester tester) async {
     await tester.pumpWidget(
-      Center(
+      const Center(
         child: ProgressBar(
           progress: Duration.zero,
           total: Duration(minutes: 5),
@@ -123,7 +123,7 @@ void main() {
   testWidgets('TimeLabelLocation.none size correct',
       (WidgetTester tester) async {
     await tester.pumpWidget(
-      Center(
+      const Center(
         child: ProgressBar(
           progress: Duration.zero,
           total: Duration(minutes: 5),
@@ -143,7 +143,7 @@ void main() {
   testWidgets('ProgressBar default size is TimeLabelLocation.below',
       (WidgetTester tester) async {
     await tester.pumpWidget(
-      Center(
+      const Center(
         child: ProgressBar(
           progress: Duration.zero,
           total: Duration(minutes: 5),
@@ -162,7 +162,7 @@ void main() {
   testWidgets('Changing the thumb radius changes the widget size',
       (WidgetTester tester) async {
     await tester.pumpWidget(
-      Center(
+      const Center(
         child: ProgressBar(
           progress: Duration.zero,
           total: Duration(minutes: 5),
@@ -184,7 +184,7 @@ void main() {
       'The height is the max of the font and thumb radius for TimeLabelLocation.sides',
       (WidgetTester tester) async {
     await tester.pumpWidget(
-      Center(
+      const Center(
         child: ProgressBar(
           progress: Duration.zero,
           total: Duration(minutes: 5),
