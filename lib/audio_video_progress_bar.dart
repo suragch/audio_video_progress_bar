@@ -8,17 +8,46 @@ import 'package:flutter/rendering.dart';
 /// This is where the current time and total time labels should appear in
 /// relation to the progress bar.
 enum TimeLabelLocation {
-  below,
+  ///  The time is displayed above the progress bar.
+  ///
+  ///  | 01:23              05:00 |
+  ///  | -------O---------------- |
   above,
+
+  ///  The time is displayed below the progress bar.
+  ///
+  ///  | -------O---------------- |
+  ///  | 01:23              05:00 |
+  below,
+
+  ///  The time is displayed on the sides of the progress bar.
+  ///
+  ///  | 01:23 -------O---------------- 05:00 |
   sides,
+
+  ///  The time is not displayed.
+  ///
+  ///  | -------O---------------- |
   none,
 }
 
-/// The right time label can be shown as the [totalTime] or as the
-/// [remainingTime]. If the choice is [remainingTime] then this will be shown
-/// as a negative number.
+/// The time label on the right hand side can be shown as the [totalTime] or as
+/// the [remainingTime]. If the choice is [remainingTime] then this will be
+/// shown as a negative number.
+///
+///
 enum TimeLabelType {
+  /// The time label on the right shows the total time.
+  ///
+  /// | -------O---------------- |
+  /// | 01:23              05:00 |
   totalTime,
+
+  /// The time label on the right shows the remaining time as a
+  /// negative number.
+  ///
+  /// | -------O---------------- |
+  /// | 01:23             -03:37 |
   remainingTime,
 }
 
@@ -120,7 +149,7 @@ class ProgressBar extends LeafRenderObjectWidget {
   /// The location for the [progress] and [total] duration text labels.
   ///
   /// By default the labels appear under the progress bar but you can also
-  /// put them on the sides or remove them altogether.
+  /// put them above, on the sides, or remove them altogether.
   final TimeLabelLocation? timeLabelLocation;
 
   /// What to display for the time label on the right
@@ -523,7 +552,7 @@ class _RenderProgressBar extends RenderBox {
     switch (_timeLabelLocation) {
       case TimeLabelLocation.below:
       case TimeLabelLocation.above:
-        return _heightWhenLabelsBelowOrAbove();
+        return _heightWhenLabelsAboveOrBelow();
       case TimeLabelLocation.sides:
         return _heightWhenLabelsOnSides();
       default:
@@ -531,7 +560,7 @@ class _RenderProgressBar extends RenderBox {
     }
   }
 
-  double _heightWhenLabelsBelowOrAbove() {
+  double _heightWhenLabelsAboveOrBelow() {
     return _heightWhenNoLabels() + _textHeight();
   }
 
@@ -557,11 +586,9 @@ class _RenderProgressBar extends RenderBox {
     canvas.translate(offset.dx, offset.dy);
 
     switch (_timeLabelLocation) {
+      case TimeLabelLocation.above:
       case TimeLabelLocation.below:
-        _drawProgressBarWithLabelsBelow(canvas);
-        break;
-        case TimeLabelLocation.above:
-        _drawProgressBarWithLabelsAbove(canvas);
+        _drawProgressBarWithLabelsAboveOrBelow(canvas);
         break;
       case TimeLabelLocation.sides:
         _drawProgressBarWithLabelsOnSides(canvas);
@@ -573,56 +600,39 @@ class _RenderProgressBar extends RenderBox {
     canvas.restore();
   }
 
-  ///  Draw the progress bar and labels in the following locations:
+  ///  Draw the progress bar and labels like this:
   ///
   ///  | -------O---------------- |
   ///  | 01:23              05:00 |
   ///
-  void _drawProgressBarWithLabelsBelow(Canvas canvas) {
+  /// Or like this:
+  ///
+  ///  | 01:23              05:00 |
+  ///  | -------O---------------- |
+  void _drawProgressBarWithLabelsAboveOrBelow(Canvas canvas) {
     // calculate sizes
     final padding = _thumbRadius;
     final barWidth = size.width - 2 * padding;
     final barHeight = 2 * _thumbRadius;
 
+    // whether to paint the labels below the progress bar or above it
+    final isLabelBelow = _timeLabelLocation == TimeLabelLocation.below;
+
     // current time label
-    final labelOffset = Offset(padding, barHeight);
+    final labelDy = (isLabelBelow) ? barHeight : 0.0;
+    final leftLabelOffset = Offset(padding, labelDy);
     final leftTimeLabel = _leftTimeLabel();
-    leftTimeLabel.paint(canvas, labelOffset);
+    leftTimeLabel.paint(canvas, leftLabelOffset);
 
     // total or remaining time label
     final rightTimeLabel = _rightTimeLabel();
     final rightLabelDx = size.width - padding - rightTimeLabel.width;
-    final rightLabelOffset = Offset(rightLabelDx, barHeight);
+    final rightLabelOffset = Offset(rightLabelDx, labelDy);
     _rightTimeLabel().paint(canvas, rightLabelOffset);
 
     // progress bar
-    _drawProgressBar(canvas, Offset(padding, 0), Size(barWidth, barHeight));
-  }
-
-  ///  Draw the progress bar and labels in the following locations:
-  ///  
-  ///  | 01:23              05:00 |
-  ///  | -------O---------------- |
-  ///
-  void _drawProgressBarWithLabelsAbove(Canvas canvas) {
-    // calculate sizes
-    final padding = _thumbRadius;
-    final barWidth = size.width - 2 * padding;
-    final barHeight = _thumbRadius;
-
-    // current time label
-    final labelOffset = Offset(padding, -barHeight * 1.5);
-    final leftTimeLabel = _leftTimeLabel();
-    leftTimeLabel.paint(canvas, labelOffset);
-
-    // total or remaining time label
-    final rightTimeLabel = _rightTimeLabel();
-    final rightLabelDx = size.width - padding - rightTimeLabel.width;
-    final rightLabelOffset = Offset(rightLabelDx, -barHeight * 1.5);
-    _rightTimeLabel().paint(canvas, rightLabelOffset);
-
-    // progress bar
-    _drawProgressBar(canvas, Offset(padding, padding * 2), Size(barWidth, barHeight));
+    final barDy = (isLabelBelow) ? 0.0 : leftTimeLabel.height;
+    _drawProgressBar(canvas, Offset(padding, barDy), Size(barWidth, barHeight));
   }
 
   ///  Draw the progress bar and labels in the following locations:

@@ -4,6 +4,19 @@ import 'package:flutter/rendering.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
+/// The basic usage for setting the progress bar state is like this:
+///
+/// ```
+/// return ProgressBar(
+///   progress: currentProgress,
+///   buffered: currentBuffered,
+///   total: totalDuration,
+/// );
+/// ```
+///
+/// This example contains some extra code to ensure that the ProgressBar works
+/// under various situations. Do a seach for "ProgressBar" to find it below.
+
 void main() {
   runApp(MyApp());
 }
@@ -12,14 +25,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeVariation>(
-        valueListenable: themeNotifier,
-        builder: (context, value, child) {
-          return MaterialApp(
-            theme: ThemeData(
-                primarySwatch: value.color, brightness: value.brightness),
-            home: HomeWidget(),
-          );
-        });
+      valueListenable: themeNotifier,
+      builder: (context, value, child) {
+        return MaterialApp(
+          theme: ThemeData(
+              primarySwatch: value.color, brightness: value.brightness),
+          home: HomeWidget(),
+        );
+      },
+    );
   }
 }
 
@@ -44,6 +58,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   late Stream<DurationState> _durationState;
   var _labelLocation = TimeLabelLocation.below;
   var _labelType = TimeLabelType.totalTime;
+  TextStyle? _labelStyle = null;
 
   @override
   void initState() {
@@ -85,6 +100,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             _themeButtons(),
             _labelLocationButtons(),
             _labelTypeButtons(),
+            _labelSizeButtons(),
             Spacer(),
             _progressBar(),
             _playButton(),
@@ -157,6 +173,25 @@ class _HomeWidgetState extends State<HomeWidget> {
     ]);
   }
 
+  Wrap _labelSizeButtons() {
+    final fontColor = Theme.of(context).textTheme.bodyText1?.color;
+    return Wrap(children: [
+      OutlinedButton(
+        child: Text('standard label size'),
+        onPressed: () {
+          setState(() => _labelStyle = null);
+        },
+      ),
+      OutlinedButton(
+        child: Text('large label'),
+        onPressed: () {
+          setState(
+              () => _labelStyle = TextStyle(fontSize: 40, color: fontColor));
+        },
+      ),
+    ]);
+  }
+
   StreamBuilder<DurationState> _progressBar() {
     return StreamBuilder<DurationState>(
       stream: _durationState,
@@ -174,6 +209,7 @@ class _HomeWidgetState extends State<HomeWidget> {
           },
           timeLabelLocation: _labelLocation,
           timeLabelType: _labelType,
+          timeLabelTextStyle: _labelStyle,
         );
       },
     );
