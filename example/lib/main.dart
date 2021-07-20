@@ -95,18 +95,20 @@ class _HomeWidgetState extends State<HomeWidget> {
   Widget build(BuildContext context) {
     debugPrint('building app');
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            _themeButtons(),
-            _labelLocationButtons(),
-            _labelTypeButtons(),
-            _labelSizeButtons(),
-            const Spacer(),
-            _progressBar(),
-            _playButton(),
-          ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              _themeButtons(),
+              _labelLocationButtons(),
+              _labelTypeButtons(),
+              _labelSizeButtons(),
+              const Spacer(),
+              _progressBar(),
+              _playButton(),
+            ],
+          ),
         ),
       ),
     );

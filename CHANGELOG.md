@@ -1,3 +1,8 @@
+## [0.6.0] - July 20, 2021
+
+* Made the thumb and rounded bar caps stay within bar bounds so that padding is maintained from side text (#13)
+* This change could possibly affect some user's layout so even though it isn't a breaking change programmatically, still bumping up a version so version upgrades won't be automatic.
+
 ## [0.5.0] - July 5, 2021
 
 * Added `TimeLabelLocation.above` (@Groseuros)

@@ -611,8 +611,7 @@ class _RenderProgressBar extends RenderBox {
   ///  | -------O---------------- |
   void _drawProgressBarWithLabelsAboveOrBelow(Canvas canvas) {
     // calculate sizes
-    final padding = _thumbRadius;
-    final barWidth = size.width - 2 * padding;
+    final barWidth = size.width;
     final barHeight = 2 * _thumbRadius;
 
     // whether to paint the labels below the progress bar or above it
@@ -620,19 +619,19 @@ class _RenderProgressBar extends RenderBox {
 
     // current time label
     final labelDy = (isLabelBelow) ? barHeight : 0.0;
-    final leftLabelOffset = Offset(padding, labelDy);
+    final leftLabelOffset = Offset(0, labelDy);
     final leftTimeLabel = _leftTimeLabel();
     leftTimeLabel.paint(canvas, leftLabelOffset);
 
     // total or remaining time label
     final rightTimeLabel = _rightTimeLabel();
-    final rightLabelDx = size.width - padding - rightTimeLabel.width;
+    final rightLabelDx = size.width - rightTimeLabel.width;
     final rightLabelOffset = Offset(rightLabelDx, labelDy);
     _rightTimeLabel().paint(canvas, rightLabelOffset);
 
     // progress bar
     final barDy = (isLabelBelow) ? 0.0 : leftTimeLabel.height;
-    _drawProgressBar(canvas, Offset(padding, barDy), Size(barWidth, barHeight));
+    _drawProgressBar(canvas, Offset(0, barDy), Size(barWidth, barHeight));
   }
 
   ///  Draw the progress bar and labels in the following locations:
@@ -641,7 +640,7 @@ class _RenderProgressBar extends RenderBox {
   ///
   void _drawProgressBarWithLabelsOnSides(Canvas canvas) {
     // calculate sizes
-    final padding = _thumbRadius;
+    const padding = 10;
     final barHeight = 2 * _thumbRadius;
 
     // painters
@@ -675,17 +674,12 @@ class _RenderProgressBar extends RenderBox {
   /// | -------O---------------- |
   ///
   void _drawProgressBarWithoutLabels(Canvas canvas) {
-    final padding = _thumbRadius;
-    final barWidth = size.width - 2 * padding;
+    final barWidth = size.width;
     final barHeight = 2 * _thumbRadius;
-    _drawProgressBar(canvas, Offset(padding, 0), Size(barWidth, barHeight));
+    _drawProgressBar(canvas, Offset.zero, Size(barWidth, barHeight));
   }
 
-  void _drawProgressBar(
-    Canvas canvas,
-    Offset offset,
-    Size localSize,
-  ) {
+  void _drawProgressBar(Canvas canvas, Offset offset, Size localSize) {
     canvas.save();
     canvas.translate(offset.dx, offset.dy);
     _drawBaseBar(canvas, localSize);
@@ -696,40 +690,53 @@ class _RenderProgressBar extends RenderBox {
   }
 
   void _drawBaseBar(Canvas canvas, Size localSize) {
-    final baseBarPaint = Paint()
-      ..color = baseBarColor
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = barHeight;
-    final startPoint = Offset(0, localSize.height / 2);
-    var endPoint = Offset(localSize.width, localSize.height / 2);
-    canvas.drawLine(startPoint, endPoint, baseBarPaint);
+    _drawBar(
+      canvas: canvas,
+      availableSize: localSize,
+      widthProportion: 1.0,
+      color: baseBarColor,
+    );
   }
 
   void _drawBufferedBar(Canvas canvas, Size localSize) {
-    final bufferedBarPaint = Paint()
-      ..color = bufferedBarColor
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = barHeight;
-    final bufferedWidth = _proportionOfTotal(_buffered) * localSize.width;
-    final startPoint = Offset(0, localSize.height / 2);
-    final endPoint = Offset(bufferedWidth, localSize.height / 2);
-    canvas.drawLine(startPoint, endPoint, bufferedBarPaint);
+    _drawBar(
+      canvas: canvas,
+      availableSize: localSize,
+      widthProportion: _proportionOfTotal(_buffered),
+      color: bufferedBarColor,
+    );
   }
 
   void _drawCurrentProgressBar(Canvas canvas, Size localSize) {
-    final progressBarPaint = Paint()
-      ..color = progressBarColor
+    _drawBar(
+      canvas: canvas,
+      availableSize: localSize,
+      widthProportion: _proportionOfTotal(_progress),
+      color: progressBarColor,
+    );
+  }
+
+  void _drawBar(
+      {required Canvas canvas,
+      required Size availableSize,
+      required double widthProportion,
+      required Color color}) {
+    final baseBarPaint = Paint()
+      ..color = color
       ..strokeCap = StrokeCap.round
-      ..strokeWidth = barHeight;
-    final progressWidth = _proportionOfTotal(_progress) * localSize.width;
-    final startPoint = Offset(0, localSize.height / 2);
-    final endPoint = Offset(progressWidth, localSize.height / 2);
-    canvas.drawLine(startPoint, endPoint, progressBarPaint);
+      ..strokeWidth = _barHeight;
+    final capRadius = _barHeight / 2;
+    final adjustedWidth = availableSize.width - barHeight;
+    final dx = widthProportion * adjustedWidth + capRadius;
+    final startPoint = Offset(capRadius, availableSize.height / 2);
+    var endPoint = Offset(dx, availableSize.height / 2);
+    canvas.drawLine(startPoint, endPoint, baseBarPaint);
   }
 
   void _drawThumb(Canvas canvas, Size localSize) {
     final thumbPaint = Paint()..color = thumbColor;
-    final thumbDx = _thumbValue * localSize.width;
+    final adjustedWidth = localSize.width - 2 * _thumbRadius;
+    final thumbDx = _thumbValue * adjustedWidth + _thumbRadius;
     final center = Offset(thumbDx, localSize.height / 2);
     if (_userIsDraggingThumb) {
       final thumbGlowPaint = Paint()..color = thumbGlowColor;
@@ -742,8 +749,7 @@ class _RenderProgressBar extends RenderBox {
     if (total.inMilliseconds == 0) {
       return 0.0;
     }
-    final proportion = duration.inMilliseconds / total.inMilliseconds;
-    return proportion;
+    return duration.inMilliseconds / total.inMilliseconds;
   }
 
   String _getTimeString(Duration time) {
