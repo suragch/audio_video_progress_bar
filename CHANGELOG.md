@@ -1,3 +1,9 @@
+## [0.6.1] - July 23, 2021
+
+* Added `timeLabelPadding` parameter for putting some extra space between the time labels and progress bar.
+* Fixed a couple bugs with thumb position
+* Added thumb radius and label padding controls to the sample project
+
 ## [0.6.0] - July 20, 2021
 
 * Made the thumb and rounded bar caps stay within bar bounds so that padding is maintained from side text (#13)

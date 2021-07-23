@@ -61,6 +61,8 @@ class _HomeWidgetState extends State<HomeWidget> {
   var _labelLocation = TimeLabelLocation.below;
   var _labelType = TimeLabelType.totalTime;
   TextStyle? _labelStyle;
+  var _thumbRadius = 10.0;
+  var _labelPadding = 0.0;
 
   @override
   void initState() {
@@ -93,7 +95,6 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('building app');
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -104,6 +105,8 @@ class _HomeWidgetState extends State<HomeWidget> {
               _labelLocationButtons(),
               _labelTypeButtons(),
               _labelSizeButtons(),
+              _thumbSizeButtons(),
+              _paddingSizeButtons(),
               const Spacer(),
               _progressBar(),
               _playButton(),
@@ -205,6 +208,52 @@ class _HomeWidgetState extends State<HomeWidget> {
     ]);
   }
 
+  Wrap _thumbSizeButtons() {
+    return Wrap(children: [
+      OutlinedButton(
+        child: const Text('standard thumb radius'),
+        onPressed: () {
+          setState(() => _thumbRadius = 10);
+        },
+      ),
+      OutlinedButton(
+        child: const Text('large'),
+        onPressed: () {
+          setState(() => _thumbRadius = 20);
+        },
+      ),
+      OutlinedButton(
+        child: const Text('small'),
+        onPressed: () {
+          setState(() => _thumbRadius = 5);
+        },
+      ),
+    ]);
+  }
+
+  Wrap _paddingSizeButtons() {
+    return Wrap(children: [
+      OutlinedButton(
+        child: const Text('standard padding'),
+        onPressed: () {
+          setState(() => _labelPadding = 0.0);
+        },
+      ),
+      OutlinedButton(
+        child: const Text('10 padding'),
+        onPressed: () {
+          setState(() => _labelPadding = 10);
+        },
+      ),
+      OutlinedButton(
+        child: const Text('-5 padding'),
+        onPressed: () {
+          setState(() => _labelPadding = -5);
+        },
+      ),
+    ]);
+  }
+
   StreamBuilder<DurationState> _progressBar() {
     return StreamBuilder<DurationState>(
       stream: _durationState,
@@ -220,9 +269,11 @@ class _HomeWidgetState extends State<HomeWidget> {
           onSeek: (duration) {
             _player.seek(duration);
           },
+          thumbRadius: _thumbRadius,
           timeLabelLocation: _labelLocation,
           timeLabelType: _labelType,
           timeLabelTextStyle: _labelStyle,
+          timeLabelPadding: _labelPadding,
         );
       },
     );

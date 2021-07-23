@@ -58,6 +58,7 @@ void main() {
     expect(progressBar.timeLabelType, TimeLabelType.remainingTime);
     expect(progressBar.timeLabelTextStyle,
         const TextStyle(color: Color(0x00000000)));
+    expect(progressBar.timeLabelPadding, 0.0);
   });
 
   testWidgets('TimeLabelLocation.below size correct',
@@ -200,5 +201,91 @@ void main() {
     final baseSize = tester.getSize(find.byType(ProgressBar));
     expect(baseSize.width, equals(800.0));
     expect(baseSize.height, equals(14.0));
+  });
+
+  group('timeLabelPadding -', () {
+    testWidgets('Size with timeLabelPadding is correct when labels below',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const Center(
+          child: ProgressBar(
+            progress: Duration.zero,
+            total: Duration(minutes: 5),
+            timeLabelPadding: 10,
+            timeLabelLocation: TimeLabelLocation.below,
+          ),
+        ),
+      );
+
+      ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
+      expect(progressBar, isNotNull);
+
+      final baseSize = tester.getSize(find.byType(ProgressBar));
+      expect(baseSize.width, equals(800.0));
+      expect(baseSize.height, equals(44.0));
+    });
+
+    testWidgets('Size with timeLabelPadding is correct when labels above',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const Center(
+          child: ProgressBar(
+            progress: Duration.zero,
+            total: Duration(minutes: 5),
+            timeLabelPadding: 10,
+            timeLabelLocation: TimeLabelLocation.above,
+          ),
+        ),
+      );
+
+      ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
+      expect(progressBar, isNotNull);
+
+      final baseSize = tester.getSize(find.byType(ProgressBar));
+      expect(baseSize.width, equals(800.0));
+      expect(baseSize.height, equals(44.0));
+    });
+
+    testWidgets('Size with timeLabelPadding is correct when labels on sides',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const Center(
+          child: ProgressBar(
+            progress: Duration.zero,
+            total: Duration(minutes: 5),
+            timeLabelPadding: 10,
+            timeLabelLocation: TimeLabelLocation.sides,
+          ),
+        ),
+      );
+
+      ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
+      expect(progressBar, isNotNull);
+
+      final baseSize = tester.getSize(find.byType(ProgressBar));
+      expect(baseSize.width, equals(800.0));
+      expect(baseSize.height, equals(20.0));
+    });
+
+    testWidgets('Size with timeLabelPadding is correct when no labels',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const Center(
+          child: ProgressBar(
+            progress: Duration.zero,
+            total: Duration(minutes: 5),
+            timeLabelPadding: 10,
+            timeLabelLocation: TimeLabelLocation.none,
+          ),
+        ),
+      );
+
+      ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
+      expect(progressBar, isNotNull);
+
+      final baseSize = tester.getSize(find.byType(ProgressBar));
+      expect(baseSize.width, equals(800.0));
+      expect(baseSize.height, equals(20.0));
+    });
   });
 }
