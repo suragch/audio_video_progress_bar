@@ -1,3 +1,7 @@
+## [0.6.2] - July 30, 2021
+
+* Initialize the thumb position based on progress and total time. This allows compatibily with the `Visibility` even when not maintaining state. (#12)
+
 ## [0.6.1] - July 23, 2021
 
 * Added `timeLabelPadding` parameter for putting some extra space between the time labels and progress bar.

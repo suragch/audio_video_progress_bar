@@ -286,6 +286,7 @@ class _RenderProgressBar extends RenderBox {
       ..onUpdate = _onDragUpdate
       ..onEnd = _onDragEnd
       ..onCancel = _finishDrag;
+    _thumbValue = _proportionOfTotal(_progress);
   }
 
   // This is the gesture recognizer used to move the thumb.
@@ -293,7 +294,7 @@ class _RenderProgressBar extends RenderBox {
 
   // This is a value between 0.0 and 1.0 used to indicate the position on
   // the bar.
-  double _thumbValue = 0.0;
+  late double _thumbValue;
 
   // The thumb can move for two reasons. One is that the [progress] changed.
   // The other is that the user is dragging the thumb. This variable keeps
