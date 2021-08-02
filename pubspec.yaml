@@ -1,7 +1,7 @@
 name: audio_video_progress_bar
 description: A progress bar widget to show or change the position of an audio or
   video stream.
-version: 0.6.2
+version: 0.7.0
 homepage: https://github.com/suragch/audio_video_progress_bar
 
 environment:
@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
 
 dev_dependencies:
-  flutter_lints: ^1.0.3
+  flutter_lints: ^1.0.4
   flutter_test:
     sdk: flutter
 

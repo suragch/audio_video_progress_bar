@@ -302,6 +302,11 @@ class _RenderProgressBar extends RenderBox {
   // time as a [progress] update there won't be a conflict.
   bool _userIsDraggingThumb = false;
 
+  // This padding is always used between the time labels and the progress bar
+  // when the time labels are on the sides. Any user defined [timeLabelPadding]
+  // is in addition to this.
+  double get _defaultSidePadding => thumbRadius + 5;
+
   void _onDragStart(DragStartDetails details) {
     _userIsDraggingThumb = true;
     _updateThumbPosition(details.localPosition);
@@ -533,11 +538,6 @@ class _RenderProgressBar extends RenderBox {
     markNeedsLayout();
   }
 
-  // This padding is always used between the time labels and the progress bar
-  // when the time labels are on the sides. Any user defined [timeLabelPadding]
-  // is in addition to this.
-  static const _defaultSidePadding = 10;
-
   // The smallest that this widget would ever want to be.
   static const _minDesiredWidth = 100.0;
 
@@ -631,7 +631,7 @@ class _RenderProgressBar extends RenderBox {
     canvas.restore();
   }
 
-  ///  Draw the progress bar and labels like this:
+  ///  Draw the progress bar and labels vertically aligned:
   ///
   ///  | -------O---------------- |
   ///  | 01:23              05:00 |
@@ -666,7 +666,7 @@ class _RenderProgressBar extends RenderBox {
     _drawProgressBar(canvas, Offset(0, barDy), Size(barWidth, barHeight));
   }
 
-  ///  Draw the progress bar and labels in the following locations:
+  ///  Draw the progress bar and labels horizontally aligned:
   ///
   ///  | 01:23 -------O---------------- 05:00 |
   ///
@@ -763,9 +763,7 @@ class _RenderProgressBar extends RenderBox {
 
   void _drawThumb(Canvas canvas, Size localSize) {
     final thumbPaint = Paint()..color = thumbColor;
-    final width = localSize.width;
-    final thumbDx =
-        (_thumbValue * width).clamp(_thumbRadius, width - _thumbRadius);
+    final thumbDx = _thumbValue * localSize.width;
     final center = Offset(thumbDx, localSize.height / 2);
     if (_userIsDraggingThumb) {
       final thumbGlowPaint = Paint()..color = thumbGlowColor;

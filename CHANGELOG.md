@@ -1,3 +1,8 @@
+## [0.7.0] - August 2, 2021
+
+* Reverted back to centering the thumb at the ends because otherwise it wouldn't move for the first and last few seconds. (#15)
+* The thumb radius is not included in the widget width calculations when the labels are above or below. That means it will get drawn outside of the widget dimentions (which was already true for the glow radius). Users can wrap the widget with Padding if more padding is needed on the ends.
+
 ## [0.6.2] - July 30, 2021
 
 * Initialize the thumb position based on progress and total time. This allows compatibily with the `Visibility` even when not maintaining state. (#12)
