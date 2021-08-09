@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/basic.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -25,6 +26,9 @@ void main() {
         total: const Duration(minutes: 5),
         buffered: const Duration(minutes: 1),
         onSeek: (duration) {},
+        onDragStart: (ThumbDragDetails details) {},
+        onDragUpdate: (ThumbDragDetails details) {},
+        onDragEnd: () {},
         barHeight: 2.0,
         baseBarColor: const Color(0x00000000),
         progressBarColor: const Color(0x00000000),
@@ -286,6 +290,107 @@ void main() {
       final baseSize = tester.getSize(find.byType(ProgressBar));
       expect(baseSize.width, equals(800.0));
       expect(baseSize.height, equals(20.0));
+    });
+  });
+
+  group('drag callbacks', () {
+    testWidgets('methods called the right number of times',
+        (WidgetTester tester) async {
+      int seekCount = 0;
+      int dragStartCount = 0;
+      int dragUpdateCount = 0;
+      int dragEndCount = 0;
+      await tester.pumpWidget(
+        ProgressBar(
+          progress: Duration.zero,
+          total: const Duration(minutes: 5),
+          onSeek: (duration) {
+            seekCount++;
+          },
+          onDragStart: (details) {
+            dragStartCount++;
+          },
+          onDragUpdate: (details) {
+            dragUpdateCount++;
+          },
+          onDragEnd: () {
+            dragEndCount++;
+          },
+        ),
+      );
+
+      // drag from the middle of the widget to the far left side
+      await tester.drag(find.byType(ProgressBar), const Offset(-100, 0));
+      expect(seekCount, 1);
+      expect(dragStartCount, 1);
+      expect(dragUpdateCount, 2);
+      expect(dragEndCount, 1);
+    });
+
+    testWidgets('callbacks have accurate duration values',
+        (WidgetTester tester) async {
+      Duration onSeekDuration = const Duration(seconds: 1);
+      Duration onDragStartDuration = const Duration(seconds: 1);
+      List<Duration> onDragUpdateDurations = [];
+      await tester.pumpWidget(
+        Center(
+          child: SizedBox(
+            width: 200,
+            child: ProgressBar(
+              progress: Duration.zero,
+              total: const Duration(minutes: 5),
+              onSeek: (duration) {
+                onSeekDuration = duration;
+              },
+              onDragStart: (details) {
+                onDragStartDuration = details.timeStamp;
+              },
+              onDragUpdate: (details) {
+                onDragUpdateDurations.add(details.timeStamp);
+              },
+            ),
+          ),
+        ),
+      );
+
+      // drag from the middle of the widget to the far left side
+      await tester.drag(find.byType(ProgressBar), const Offset(-100, 0));
+      expect(onSeekDuration, Duration.zero);
+      expect(onDragStartDuration, const Duration(minutes: 2, seconds: 30));
+      expect(onDragUpdateDurations[0], const Duration(minutes: 2, seconds: 0));
+      expect(onDragUpdateDurations[1], Duration.zero);
+    });
+
+    testWidgets('callbacks have accurate position values for no side labels',
+        (WidgetTester tester) async {
+      ThumbDragDetails onDragStartDetails = const ThumbDragDetails();
+      List<ThumbDragDetails> onDragDetails = [];
+      await tester.pumpWidget(
+        Center(
+          child: SizedBox(
+            width: 200,
+            child: ProgressBar(
+              progress: Duration.zero,
+              total: const Duration(minutes: 5),
+              onDragStart: (details) {
+                onDragStartDetails = details;
+              },
+              onDragUpdate: (details) {
+                onDragDetails.add(details);
+              },
+            ),
+          ),
+        ),
+      );
+
+      // drag from the middle of the widget to the far left side
+      await tester.drag(find.byType(ProgressBar), const Offset(-100, 0));
+      expect(onDragStartDetails.globalPosition, const Offset(400.0, 300.0));
+      expect(onDragStartDetails.localPosition, const Offset(100.0, 17.0));
+      expect(onDragDetails[0].globalPosition, const Offset(380.0, 300.0));
+      expect(onDragDetails[0].localPosition, const Offset(80.0, 17.0));
+      expect(onDragDetails[1].globalPosition, const Offset(300.0, 300.0));
+      expect(onDragDetails[1].localPosition, const Offset(0.0, 17.0));
     });
   });
 }

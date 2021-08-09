@@ -70,6 +70,9 @@ class ProgressBar extends LeafRenderObjectWidget {
     required this.total,
     this.buffered,
     this.onSeek,
+    this.onDragStart,
+    this.onDragUpdate,
+    this.onDragEnd,
     this.barHeight = 5.0,
     this.baseBarColor,
     this.progressBarColor,
@@ -106,6 +109,47 @@ class ProgressBar extends LeafRenderObjectWidget {
   /// You will get the chosen duration to start playing at which you can pass
   /// on to your media player.
   final ValueChanged<Duration>? onSeek;
+
+  /// A callback when the user starts to move the thumb.
+  ///
+  /// This will be called only once when the drag begins. This provides you
+  /// with the [ThumbDragDetails].
+  ///
+  /// This method is useful if you are planning to do something like add a time
+  /// label and/or video preview over the thumb and you need to do some
+  /// initialization.
+  ///
+  /// Use [onSeek] if you only want to seek to a new audio position when the
+  /// drag event has finished.
+  final ThumbDragStartCallback? onDragStart;
+
+  /// A callback when the user is moving the thumb.
+  ///
+  /// This will be called repeatedly as the thumb position changes. This
+  /// provides you with the [ThumbDragDetails], which notify you of the global
+  /// and local positions of the drag event as well as the current thumb
+  /// duration. The current thumb duration will not go beyond [total] or less
+  /// that `Duration.zero` so you can use this information to clamp the drag
+  /// position values.
+  ///
+  /// This method is useful if you are planning to do something like add a time
+  /// label and/or video preview over the thumb and need to update the position
+  /// to stay in sync with the thumb position.
+  ///
+  /// Use [onSeek] if you only want to seek to a new audio position when the
+  /// drag event has finished.
+  final ThumbDragUpdateCallback? onDragUpdate;
+
+  /// A callback when the user is finished moving the thumb.
+  ///
+  /// This will be called only once when the drag ends.
+  ///
+  /// This method is useful if you are planning to do something like add a time
+  /// label and/or video preview over the thumb and you need to dispose of
+  /// something when the drag is finished.
+  ///
+  /// This method is called directly before [onSeek].
+  final VoidCallback? onDragEnd;
 
   /// The color of the progress bar before playback has started.
   ///
@@ -180,6 +224,9 @@ class ProgressBar extends LeafRenderObjectWidget {
       total: total,
       buffered: buffered ?? Duration.zero,
       onSeek: onSeek,
+      onDragStart: onDragStart,
+      onDragUpdate: onDragUpdate,
+      onDragEnd: onDragEnd,
       barHeight: barHeight,
       baseBarColor: baseBarColor ?? primaryColor.withOpacity(0.24),
       progressBarColor: progressBarColor ?? primaryColor,
@@ -207,6 +254,9 @@ class ProgressBar extends LeafRenderObjectWidget {
       ..total = total
       ..buffered = buffered ?? Duration.zero
       ..onSeek = onSeek
+      ..onDragStart = onDragStart
+      ..onDragUpdate = onDragUpdate
+      ..onDragEnd = onDragEnd
       ..barHeight = barHeight
       ..baseBarColor = baseBarColor ?? primaryColor.withOpacity(0.24)
       ..progressBarColor = progressBarColor ?? primaryColor
@@ -230,6 +280,14 @@ class ProgressBar extends LeafRenderObjectWidget {
     properties.add(StringProperty('buffered', buffered.toString()));
     properties.add(ObjectFlagProperty<ValueChanged<Duration>>('onSeek', onSeek,
         ifNull: 'unimplemented'));
+    properties.add(ObjectFlagProperty<ThumbDragStartCallback>(
+        'onDragStart', onDragStart,
+        ifNull: 'unimplemented'));
+    properties.add(ObjectFlagProperty<ThumbDragUpdateCallback>(
+        'onDragUpdate', onDragUpdate,
+        ifNull: 'unimplemented'));
+    properties.add(ObjectFlagProperty<VoidCallback>('onDragEnd', onDragEnd,
+        ifNull: 'unimplemented'));
     properties.add(DoubleProperty('barHeight', barHeight));
     properties.add(ColorProperty('baseBarColor', baseBarColor));
     properties.add(ColorProperty('progressBarColor', progressBarColor));
@@ -247,12 +305,44 @@ class ProgressBar extends LeafRenderObjectWidget {
   }
 }
 
+/// The callback signature for when the thumb begins a horizontal drag.
+typedef ThumbDragStartCallback = void Function(ThumbDragDetails details);
+
+/// The callback signature for when the thumb is moving on horizontally and has
+/// new data.
+typedef ThumbDragUpdateCallback = void Function(ThumbDragDetails details);
+
+/// Data to pass back on drag callback events
+class ThumbDragDetails {
+  const ThumbDragDetails({
+    this.timeStamp = Duration.zero,
+    this.globalPosition = Offset.zero,
+    this.localPosition = Offset.zero,
+  });
+
+  /// The duration position of the thumb on the progress bar
+  final Duration timeStamp;
+
+  /// The global position of the drag event moving the thumb on the progress bar.
+  final Offset globalPosition;
+
+  /// The local position of the drag event moving the thumb on the progress bar.
+  final Offset localPosition;
+
+  @override
+  String toString() =>
+      '${objectRuntimeType(this, 'ThumbDragDetails')}(time: $timeStamp, global: $globalPosition, local: $localPosition)';
+}
+
 class _RenderProgressBar extends RenderBox {
   _RenderProgressBar({
     required Duration progress,
     required Duration total,
     required Duration buffered,
     ValueChanged<Duration>? onSeek,
+    ThumbDragStartCallback? onDragStart,
+    ThumbDragUpdateCallback? onDragUpdate,
+    VoidCallback? onDragEnd,
     required double barHeight,
     required Color baseBarColor,
     required Color progressBarColor,
@@ -269,6 +359,9 @@ class _RenderProgressBar extends RenderBox {
         _total = total,
         _buffered = buffered,
         _onSeek = onSeek,
+        _onDragStartUserCallback = onDragStart,
+        _onDragUpdateUserCallback = onDragUpdate,
+        _onDragEndUserCallback = onDragEnd,
         _barHeight = barHeight,
         _baseBarColor = baseBarColor,
         _progressBarColor = progressBarColor,
@@ -310,21 +403,36 @@ class _RenderProgressBar extends RenderBox {
   void _onDragStart(DragStartDetails details) {
     _userIsDraggingThumb = true;
     _updateThumbPosition(details.localPosition);
+    onDragStart?.call(ThumbDragDetails(
+      timeStamp: _currentThumbDuration(),
+      globalPosition: details.globalPosition,
+      localPosition: details.localPosition,
+    ));
   }
 
   void _onDragUpdate(DragUpdateDetails details) {
     _updateThumbPosition(details.localPosition);
+    onDragUpdate?.call(ThumbDragDetails(
+      timeStamp: _currentThumbDuration(),
+      globalPosition: details.globalPosition,
+      localPosition: details.localPosition,
+    ));
   }
 
   void _onDragEnd(DragEndDetails details) {
-    final thumbMiliseconds = _thumbValue * total.inMilliseconds;
-    onSeek?.call(Duration(milliseconds: thumbMiliseconds.round()));
+    onDragEnd?.call();
+    onSeek?.call(_currentThumbDuration());
     _finishDrag();
   }
 
   void _finishDrag() {
     _userIsDraggingThumb = false;
     markNeedsPaint();
+  }
+
+  Duration _currentThumbDuration() {
+    final thumbMiliseconds = _thumbValue * total.inMilliseconds;
+    return Duration(milliseconds: thumbMiliseconds.round());
   }
 
   // This needs to stay in sync with the layout. This could be a potential
@@ -424,6 +532,36 @@ class _RenderProgressBar extends RenderBox {
       return;
     }
     _onSeek = value;
+  }
+
+  /// A callback when the thumb starts being dragged.
+  ThumbDragStartCallback? get onDragStart => _onDragStartUserCallback;
+  ThumbDragStartCallback? _onDragStartUserCallback;
+  set onDragStart(ThumbDragStartCallback? value) {
+    if (value == _onDragStartUserCallback) {
+      return;
+    }
+    _onDragStartUserCallback = value;
+  }
+
+  /// A callback when the thumb is being dragged.
+  ThumbDragUpdateCallback? get onDragUpdate => _onDragUpdateUserCallback;
+  ThumbDragUpdateCallback? _onDragUpdateUserCallback;
+  set onDragUpdate(ThumbDragUpdateCallback? value) {
+    if (value == _onDragUpdateUserCallback) {
+      return;
+    }
+    _onDragUpdateUserCallback = value;
+  }
+
+  /// A callback when the thumb drag is finished.
+  VoidCallback? get onDragEnd => _onDragEndUserCallback;
+  VoidCallback? _onDragEndUserCallback;
+  set onDragEnd(VoidCallback? value) {
+    if (value == _onDragEndUserCallback) {
+      return;
+    }
+    _onDragEndUserCallback = value;
   }
 
   /// The vertical thickness of the bar that the thumb moves along.
