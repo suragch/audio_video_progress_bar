@@ -269,6 +269,9 @@ class _HomeWidgetState extends State<HomeWidget> {
           onSeek: (duration) {
             _player.seek(duration);
           },
+          onDragUpdate: (details) {
+            debugPrint('${details.timeStamp}, ${details.localPosition}');
+          },
           thumbRadius: _thumbRadius,
           timeLabelLocation: _labelLocation,
           timeLabelType: _labelType,
