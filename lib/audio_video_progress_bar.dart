@@ -91,6 +91,7 @@ class ProgressBar extends LeafRenderObjectWidget {
     this.thumbColor,
     this.thumbGlowColor,
     this.thumbGlowRadius = 30.0,
+    this.thumbCanPaintOutsideBar = true,
     this.timeLabelLocation,
     this.timeLabelType,
     this.timeLabelTextStyle,
@@ -207,6 +208,23 @@ class ProgressBar extends LeafRenderObjectWidget {
   /// By default it is 30.
   final double thumbGlowRadius;
 
+  /// Whether the thumb radius will before the start of the bar when at the
+  /// beginning or after the end of the bar when at the end.
+  ///
+  /// The default is `true` and this means that the thumb will be painted
+  /// outside of the bounds of the widget if there are no side labels. You can
+  /// wrap [ProgressBar] with a `Padding` widget if your layout needs to leave
+  /// some extra room for the thumb.
+  ///
+  /// When set to `false` the thumb will be clamped within the width of the
+  /// bar. This is nice for aligning the thumb with vertical labels at the start
+  /// and end of playback. However, because of the clamping, the thumb won't
+  /// move during audio/video playback when near the ends. Depending on the
+  /// size of the thumb and the length of the song, this usually only lasts
+  /// a few seconds. The progress label still indicates that playback
+  /// is happening during this time, though.
+  final bool thumbCanPaintOutsideBar;
+
   /// The location for the [progress] and [total] duration text labels.
   ///
   /// By default the labels appear under the progress bar but you can also
@@ -253,6 +271,7 @@ class ProgressBar extends LeafRenderObjectWidget {
       thumbGlowColor:
           thumbGlowColor ?? (thumbColor ?? primaryColor).withAlpha(80),
       thumbGlowRadius: thumbGlowRadius,
+      thumbCanPaintOutsideBar: thumbCanPaintOutsideBar,
       timeLabelLocation: timeLabelLocation ?? TimeLabelLocation.below,
       timeLabelType: timeLabelType ?? TimeLabelType.totalTime,
       timeLabelTextStyle: textStyle,
@@ -284,6 +303,7 @@ class ProgressBar extends LeafRenderObjectWidget {
       ..thumbGlowColor =
           thumbGlowColor ?? (thumbColor ?? primaryColor).withAlpha(80)
       ..thumbGlowRadius = thumbGlowRadius
+      ..thumbCanPaintOutsideBar = thumbCanPaintOutsideBar
       ..timeLabelLocation = timeLabelLocation ?? TimeLabelLocation.below
       ..timeLabelType = timeLabelType ?? TimeLabelType.totalTime
       ..timeLabelTextStyle = textStyle
@@ -315,6 +335,8 @@ class ProgressBar extends LeafRenderObjectWidget {
     properties.add(ColorProperty('thumbColor', thumbColor));
     properties.add(ColorProperty('thumbGlowColor', thumbGlowColor));
     properties.add(DoubleProperty('thumbGlowRadius', thumbGlowRadius));
+    properties.add(FlagProperty('thumbCanPaintOutsideBar',
+        value: thumbCanPaintOutsideBar));
     properties
         .add(StringProperty('timeLabelLocation', timeLabelLocation.toString()));
     properties.add(StringProperty('timeLabelType', timeLabelType.toString()));
@@ -373,6 +395,7 @@ class _RenderProgressBar extends RenderBox {
     required Color thumbColor,
     required Color thumbGlowColor,
     double thumbGlowRadius = 30.0,
+    bool thumbCanPaintOutsideBar = true,
     required TimeLabelLocation timeLabelLocation,
     required TimeLabelType timeLabelType,
     TextStyle? timeLabelTextStyle,
@@ -393,6 +416,7 @@ class _RenderProgressBar extends RenderBox {
         _thumbColor = thumbColor,
         _thumbGlowColor = thumbGlowColor,
         _thumbGlowRadius = thumbGlowRadius,
+        _thumbCanPaintOutsideBar = thumbCanPaintOutsideBar,
         _timeLabelLocation = timeLabelLocation,
         _timeLabelType = timeLabelType,
         _timeLabelTextStyle = timeLabelTextStyle,
@@ -421,7 +445,10 @@ class _RenderProgressBar extends RenderBox {
   // This padding is always used between the time labels and the progress bar
   // when the time labels are on the sides. Any user defined [timeLabelPadding]
   // is in addition to this.
-  double get _defaultSidePadding => thumbRadius + 5;
+  double get _defaultSidePadding {
+    const minPadding = 5.0;
+    return (_thumbCanPaintOutsideBar) ? thumbRadius + minPadding : minPadding;
+  }
 
   void _onDragStart(DragStartDetails details) {
     _userIsDraggingThumb = true;
@@ -691,6 +718,15 @@ class _RenderProgressBar extends RenderBox {
     markNeedsLayout();
   }
 
+  /// Whether the thumb will paint before the start or after the end of the bar.
+  bool get thumbCanPaintOutsideBar => _thumbCanPaintOutsideBar;
+  bool _thumbCanPaintOutsideBar;
+  set thumbCanPaintOutsideBar(bool value) {
+    if (_thumbCanPaintOutsideBar == value) return;
+    _thumbCanPaintOutsideBar = value;
+    markNeedsPaint();
+  }
+
   /// The position of the duration text labels for the progress and total time.
   TimeLabelLocation get timeLabelLocation => _timeLabelLocation;
   TimeLabelLocation _timeLabelLocation;
@@ -709,6 +745,7 @@ class _RenderProgressBar extends RenderBox {
   set timeLabelType(TimeLabelType value) {
     if (_timeLabelType == value) return;
     _timeLabelType = value;
+    _clearLabelCache();
     markNeedsLayout();
   }
 
@@ -719,6 +756,7 @@ class _RenderProgressBar extends RenderBox {
   set timeLabelTextStyle(TextStyle? value) {
     if (_timeLabelTextStyle == value) return;
     _timeLabelTextStyle = value;
+    _clearLabelCache();
     markNeedsLayout();
   }
 
@@ -877,7 +915,7 @@ class _RenderProgressBar extends RenderBox {
 
     // progress bar
     final leftLabelWidth = leftLabelSize.width;
-    final barHeight = 2 * _thumbRadius;
+    final barHeight = _heightWhenNoLabels();
     final barWidth = size.width -
         2 * _defaultSidePadding -
         2 * _timeLabelPadding -
@@ -960,7 +998,7 @@ class _RenderProgressBar extends RenderBox {
     final barCapRadius = _barHeight / 2;
     final availableWidth = localSize.width - _barHeight;
     var thumbDx = _thumbValue * availableWidth + barCapRadius;
-    if (true) {
+    if (!_thumbCanPaintOutsideBar) {
       thumbDx = thumbDx.clamp(_thumbRadius, localSize.width - _thumbRadius);
     }
     final center = Offset(thumbDx, localSize.height / 2);

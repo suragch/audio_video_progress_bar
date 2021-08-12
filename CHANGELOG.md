@@ -1,6 +1,7 @@
 ## [0.9.0] - August 12, 2021
 
-- 
+- Added `barCapShape` to select `BarCapShape.round` or `BarCapShape.square` for the ends. (#20)
+- Added `thumbCanPaintOutsideBar` to control whether the thumb paints before the start or after then end of the bar. (#21)
 - Fixed sizing bug when bar height is greater that thumb diameter.
 - Fixed dragging and thumb painting misalignment bug.
 - Fixed jittery bar that readjusts for changing label widths when labels on sides.

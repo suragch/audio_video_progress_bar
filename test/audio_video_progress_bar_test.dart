@@ -34,9 +34,11 @@ void main() {
         progressBarColor: const Color(0x00000000),
         bufferedBarColor: const Color(0x00000000),
         thumbRadius: 20.0,
+        barCapShape: BarCapShape.square,
         thumbColor: const Color(0x00000000),
         thumbGlowColor: const Color(0x00000000),
         thumbGlowRadius: 50.0,
+        thumbCanPaintOutsideBar: false,
         timeLabelLocation: TimeLabelLocation.sides,
         timeLabelType: TimeLabelType.remainingTime,
         timeLabelTextStyle: const TextStyle(color: Color(0x00000000)),
@@ -55,9 +57,11 @@ void main() {
     expect(progressBar.progressBarColor, const Color(0x00000000));
     expect(progressBar.bufferedBarColor, const Color(0x00000000));
     expect(progressBar.thumbRadius, 20.0);
+    expect(progressBar.barCapShape, BarCapShape.square);
     expect(progressBar.thumbColor, const Color(0x00000000));
     expect(progressBar.thumbGlowColor, const Color(0x00000000));
     expect(progressBar.thumbGlowRadius, 50.0);
+    expect(progressBar.thumbCanPaintOutsideBar, false);
     expect(progressBar.timeLabelLocation, TimeLabelLocation.sides);
     expect(progressBar.timeLabelType, TimeLabelType.remainingTime);
     expect(progressBar.timeLabelTextStyle,
@@ -357,7 +361,8 @@ void main() {
       await tester.drag(find.byType(ProgressBar), const Offset(-100, 0));
       expect(onSeekDuration, Duration.zero);
       expect(onDragStartDuration, const Duration(minutes: 2, seconds: 30));
-      expect(onDragUpdateDurations[0], const Duration(minutes: 2, seconds: 0));
+      expect(onDragUpdateDurations[0],
+          const Duration(minutes: 1, seconds: 59, milliseconds: 231));
       expect(onDragUpdateDurations[1], Duration.zero);
     });
 

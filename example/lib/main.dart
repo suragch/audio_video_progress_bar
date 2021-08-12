@@ -66,11 +66,12 @@ class _HomeWidgetState extends State<HomeWidget> {
   var _labelPadding = 0.0;
   var _barHeight = 5.0;
   var _barCapShape = BarCapShape.round;
-  Color? _baseBarColor = null;
-  Color? _progressBarColor = null;
-  Color? _bufferedBarColor = null;
-  Color? _thumbColor = null;
-  Color? _thumbGlowColor = null;
+  Color? _baseBarColor;
+  Color? _progressBarColor;
+  Color? _bufferedBarColor;
+  Color? _thumbColor;
+  Color? _thumbGlowColor;
+  var _thumbCanPaintOutsideBar = true;
 
   @override
   void initState() {
@@ -128,10 +129,11 @@ class _HomeWidgetState extends State<HomeWidget> {
                       '------- Bar -------',
                       style: TextStyle(fontSize: 20),
                     ),
+                    _barColorButtons(),
                     _barCapShapeButtons(),
                     _barHeightButtons(),
                     _thumbSizeButtons(),
-                    _barColorButtons(),
+                    _thumbOutsideBarButtons(),
                   ],
                 ),
               ),
@@ -379,6 +381,23 @@ class _HomeWidgetState extends State<HomeWidget> {
     ]);
   }
 
+  Wrap _thumbOutsideBarButtons() {
+    return Wrap(children: [
+      OutlinedButton(
+        child: const Text('thumb can paint outside bar'),
+        onPressed: () {
+          setState(() => _thumbCanPaintOutsideBar = true);
+        },
+      ),
+      OutlinedButton(
+        child: const Text('false'),
+        onPressed: () {
+          setState(() => _thumbCanPaintOutsideBar = false);
+        },
+      ),
+    ]);
+  }
+
   StreamBuilder<DurationState> _progressBar() {
     return StreamBuilder<DurationState>(
       stream: _durationState,
@@ -405,6 +424,7 @@ class _HomeWidgetState extends State<HomeWidget> {
           thumbGlowColor: _thumbGlowColor,
           barCapShape: _barCapShape,
           thumbRadius: _thumbRadius,
+          thumbCanPaintOutsideBar: _thumbCanPaintOutsideBar,
           timeLabelLocation: _labelLocation,
           timeLabelType: _labelType,
           timeLabelTextStyle: _labelStyle,
