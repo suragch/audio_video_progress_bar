@@ -372,7 +372,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             _progressBarColor = Colors.green;
             _bufferedBarColor = Colors.grey.withOpacity(0.2);
             _thumbColor = Colors.purple;
-            _thumbGlowColor = Colors.amber.withOpacity(0.3);
+            _thumbGlowColor = Colors.green.withOpacity(0.3);
           });
         },
       ),

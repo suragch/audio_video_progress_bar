@@ -1,7 +1,9 @@
 ## [0.9.0] - August 12, 2021
 
 - 
-- Fix sizing bug when bar height is greater that thumb diameter.
+- Fixed sizing bug when bar height is greater that thumb diameter.
+- Fixed dragging and thumb painting misalignment bug.
+- Fixed jittery bar that readjusts for changing label widths when labels on sides.
 
 ## [0.8.0] - August 11, 2021
 

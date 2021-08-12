@@ -468,9 +468,9 @@ class _RenderProgressBar extends RenderBox {
     double lengthAfter = 0.0;
     if (_timeLabelLocation == TimeLabelLocation.sides) {
       lengthBefore =
-          _leftTimeLabel().width + _defaultSidePadding + _timeLabelPadding;
+          _leftLabelSize.width + _defaultSidePadding + _timeLabelPadding;
       lengthAfter =
-          _rightTimeLabel().width + _defaultSidePadding + _timeLabelPadding;
+          _rightLabelSize.width + _defaultSidePadding + _timeLabelPadding;
     }
     // The paint used to draw the bar line draws half of the cap before the
     // start of the line (and after the end of the line). The cap radius is
@@ -493,11 +493,31 @@ class _RenderProgressBar extends RenderBox {
     if (_progress == value) {
       return;
     }
+    if (_progress.inHours != value.inHours) {
+      _clearLabelCache();
+    }
     _progress = value;
     if (!_userIsDraggingThumb) {
       _thumbValue = _proportionOfTotal(value);
     }
     markNeedsPaint();
+  }
+
+  TextPainter? _cachedLeftLabel;
+  Size get _leftLabelSize {
+    _cachedLeftLabel ??= _leftTimeLabel();
+    return _cachedLeftLabel!.size;
+  }
+
+  TextPainter? _cachedRightLabel;
+  Size get _rightLabelSize {
+    _cachedRightLabel ??= _rightTimeLabel();
+    return _cachedRightLabel!.size;
+  }
+
+  void _clearLabelCache() {
+    _cachedLeftLabel = null;
+    _cachedRightLabel = null;
   }
 
   TextPainter _leftTimeLabel() {
@@ -532,6 +552,9 @@ class _RenderProgressBar extends RenderBox {
   set total(Duration value) {
     if (_total == value) {
       return;
+    }
+    if (_total.inHours != value.inHours) {
+      _clearLabelCache();
     }
     _total = value;
     markNeedsPaint();
@@ -774,7 +797,7 @@ class _RenderProgressBar extends RenderBox {
   }
 
   double _textHeight() {
-    return _leftTimeLabel().height;
+    return _leftLabelSize.height;
   }
 
   @override
@@ -821,18 +844,16 @@ class _RenderProgressBar extends RenderBox {
     // current time label
     final labelDy = (isLabelBelow) ? barHeight + _timeLabelPadding : 0.0;
     final leftLabelOffset = Offset(0, labelDy);
-    final leftTimeLabel = _leftTimeLabel();
-    leftTimeLabel.paint(canvas, leftLabelOffset);
+    _leftTimeLabel().paint(canvas, leftLabelOffset);
 
     // total or remaining time label
-    final rightTimeLabel = _rightTimeLabel();
-    final rightLabelDx = size.width - rightTimeLabel.width;
+    final rightLabelDx = size.width - _rightLabelSize.width;
     final rightLabelOffset = Offset(rightLabelDx, labelDy);
     _rightTimeLabel().paint(canvas, rightLabelOffset);
 
     // progress bar
     final barDy =
-        (isLabelBelow) ? 0.0 : leftTimeLabel.height + _timeLabelPadding;
+        (isLabelBelow) ? 0.0 : _leftLabelSize.height + _timeLabelPadding;
     _drawProgressBar(canvas, Offset(0, barDy), Size(barWidth, barHeight));
   }
 
@@ -842,20 +863,20 @@ class _RenderProgressBar extends RenderBox {
   ///
   void _drawProgressBarWithLabelsOnSides(Canvas canvas) {
     // left time label
-    final leftTimeLabel = _leftTimeLabel();
-    final verticalOffset = size.height / 2 - leftTimeLabel.height / 2;
+    final leftLabelSize = _leftLabelSize;
+    final verticalOffset = size.height / 2 - leftLabelSize.height / 2;
     final leftLabelOffset = Offset(0, verticalOffset);
-    leftTimeLabel.paint(canvas, leftLabelOffset);
+    _leftTimeLabel().paint(canvas, leftLabelOffset);
 
     // right time label
-    final rightTimeLabel = _rightTimeLabel();
-    final rightLabelWidth = rightTimeLabel.width;
+    final rightLabelSize = _rightLabelSize;
+    final rightLabelWidth = rightLabelSize.width;
     final totalLabelDx = size.width - rightLabelWidth;
     final totalLabelOffset = Offset(totalLabelDx, verticalOffset);
-    rightTimeLabel.paint(canvas, totalLabelOffset);
+    _rightTimeLabel().paint(canvas, totalLabelOffset);
 
     // progress bar
-    final leftLabelWidth = leftTimeLabel.width;
+    final leftLabelWidth = leftLabelSize.width;
     final barHeight = 2 * _thumbRadius;
     final barWidth = size.width -
         2 * _defaultSidePadding -
