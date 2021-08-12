@@ -21,7 +21,7 @@ ProgressBar(
 ),
 ```
 
-However, you would normally wrap it in a `StreamBuilder` that is updated by an audio or video player. That might look something like this:
+However, you would normally wrap it in a builder widget that is updated by an audio or video player. That might look something like this:
 
 ```dart
 StreamBuilder<DurationState>(

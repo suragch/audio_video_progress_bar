@@ -58,11 +58,19 @@ class _HomeWidgetState extends State<HomeWidget> {
   late AudioPlayer _player;
   final url = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3';
   late Stream<DurationState> _durationState;
+  var _isShowingWidgetOutline = false;
   var _labelLocation = TimeLabelLocation.below;
   var _labelType = TimeLabelType.totalTime;
   TextStyle? _labelStyle;
   var _thumbRadius = 10.0;
   var _labelPadding = 0.0;
+  var _barHeight = 5.0;
+  var _barCapShape = BarCapShape.round;
+  Color? _baseBarColor = null;
+  Color? _progressBarColor = null;
+  Color? _bufferedBarColor = null;
+  Color? _thumbColor = null;
+  Color? _thumbGlowColor = null;
 
   @override
   void initState() {
@@ -101,14 +109,37 @@ class _HomeWidgetState extends State<HomeWidget> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              _themeButtons(),
-              _labelLocationButtons(),
-              _labelTypeButtons(),
-              _labelSizeButtons(),
-              _thumbSizeButtons(),
-              _paddingSizeButtons(),
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _themeButtons(),
+                    _widgetSizeButtons(),
+                    const SizedBox(height: 20),
+                    const Text(
+                      '------- Labels -------',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    _labelLocationButtons(),
+                    _labelTypeButtons(),
+                    _labelSizeButtons(),
+                    _paddingSizeButtons(),
+                    const SizedBox(height: 20),
+                    const Text(
+                      '------- Bar -------',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    _barCapShapeButtons(),
+                    _barHeightButtons(),
+                    _thumbSizeButtons(),
+                    _barColorButtons(),
+                  ],
+                ),
+              ),
               const Spacer(),
-              _progressBar(),
+              Container(
+                decoration: _widgetBorder(),
+                child: _progressBar(),
+              ),
               _playButton(),
             ],
           ),
@@ -134,6 +165,31 @@ class _HomeWidgetState extends State<HomeWidget> {
         },
       ),
     ]);
+  }
+
+  Wrap _widgetSizeButtons() {
+    return Wrap(children: [
+      OutlinedButton(
+        child: const Text('hide widget size'),
+        onPressed: () {
+          setState(() => _isShowingWidgetOutline = false);
+        },
+      ),
+      OutlinedButton(
+        child: const Text('show'),
+        onPressed: () {
+          setState(() => _isShowingWidgetOutline = true);
+        },
+      ),
+    ]);
+  }
+
+  BoxDecoration _widgetBorder() {
+    return BoxDecoration(
+      border: _isShowingWidgetOutline
+          ? Border.all(color: Colors.red)
+          : Border.all(color: Colors.transparent),
+    );
   }
 
   Wrap _labelLocationButtons() {
@@ -186,7 +242,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     final fontColor = Theme.of(context).textTheme.bodyText1?.color;
     return Wrap(children: [
       OutlinedButton(
-        child: const Text('standard label size'),
+        child: const Text('standard font size'),
         onPressed: () {
           setState(() => _labelStyle = null);
         },
@@ -254,6 +310,75 @@ class _HomeWidgetState extends State<HomeWidget> {
     ]);
   }
 
+  Wrap _barHeightButtons() {
+    return Wrap(children: [
+      OutlinedButton(
+        child: const Text('standard bar height'),
+        onPressed: () {
+          setState(() => _barHeight = 5.0);
+        },
+      ),
+      OutlinedButton(
+        child: const Text('thin'),
+        onPressed: () {
+          setState(() => _barHeight = 1.0);
+        },
+      ),
+      OutlinedButton(
+        child: const Text('thick'),
+        onPressed: () {
+          setState(() => _barHeight = 20.0);
+        },
+      ),
+    ]);
+  }
+
+  Wrap _barCapShapeButtons() {
+    return Wrap(children: [
+      OutlinedButton(
+        child: const Text('round caps'),
+        onPressed: () {
+          setState(() => _barCapShape = BarCapShape.round);
+        },
+      ),
+      OutlinedButton(
+        child: const Text('square'),
+        onPressed: () {
+          setState(() => _barCapShape = BarCapShape.square);
+        },
+      ),
+    ]);
+  }
+
+  Wrap _barColorButtons() {
+    return Wrap(children: [
+      OutlinedButton(
+        child: const Text('theme colors'),
+        onPressed: () {
+          setState(() {
+            _baseBarColor = null;
+            _progressBarColor = null;
+            _bufferedBarColor = null;
+            _thumbColor = null;
+            _thumbGlowColor = null;
+          });
+        },
+      ),
+      OutlinedButton(
+        child: const Text('custom'),
+        onPressed: () {
+          setState(() {
+            _baseBarColor = Colors.grey.withOpacity(0.2);
+            _progressBarColor = Colors.green;
+            _bufferedBarColor = Colors.grey.withOpacity(0.2);
+            _thumbColor = Colors.purple;
+            _thumbGlowColor = Colors.amber.withOpacity(0.3);
+          });
+        },
+      ),
+    ]);
+  }
+
   StreamBuilder<DurationState> _progressBar() {
     return StreamBuilder<DurationState>(
       stream: _durationState,
@@ -272,6 +397,13 @@ class _HomeWidgetState extends State<HomeWidget> {
           onDragUpdate: (details) {
             debugPrint('${details.timeStamp}, ${details.localPosition}');
           },
+          barHeight: _barHeight,
+          baseBarColor: _baseBarColor,
+          progressBarColor: _progressBarColor,
+          bufferedBarColor: _bufferedBarColor,
+          thumbColor: _thumbColor,
+          thumbGlowColor: _thumbGlowColor,
+          barCapShape: _barCapShape,
           thumbRadius: _thumbRadius,
           timeLabelLocation: _labelLocation,
           timeLabelType: _labelType,

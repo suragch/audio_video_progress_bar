@@ -1,3 +1,8 @@
+## [0.9.0] - August 12, 2021
+
+- 
+- Fix sizing bug when bar height is greater that thumb diameter.
+
 ## [0.8.0] - August 11, 2021
 
 - Added `onDragStart`, `onDragUpdate`, and `onDragEnd` callback parameters so that developers can add a label and/or video preview above the thumb. The first two provide `ThumbDragDetails` data to the callback.
