@@ -1017,16 +1017,15 @@ class _RenderProgressBar extends RenderBox {
   }
 
   String _getTimeString(Duration time) {
-    final minutes = time.inMinutes
-        .remainder(Duration.minutesPerHour)
-        .toString()
-        .padLeft(2, '0');
+    final minutes =
+        time.inMinutes.remainder(Duration.minutesPerHour).toString();
     final seconds = time.inSeconds
         .remainder(Duration.secondsPerMinute)
         .toString()
         .padLeft(2, '0');
-    final hours = total.inHours > 0 ? '${time.inHours}:' : '';
-    return "$hours$minutes:$seconds";
+    return time.inHours > 0
+        ? "${time.inHours}:${minutes.padLeft(2, "0")}:$seconds"
+        : "$minutes:$seconds";
   }
 
   @override
