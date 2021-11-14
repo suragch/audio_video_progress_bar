@@ -584,6 +584,9 @@ class _RenderProgressBar extends RenderBox {
       _clearLabelCache();
     }
     _total = value;
+    if (!_userIsDraggingThumb) {
+      _thumbValue = _proportionOfTotal(progress);
+    }
     markNeedsPaint();
   }
 
