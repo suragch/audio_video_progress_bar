@@ -119,6 +119,10 @@ class ProgressBar extends LeafRenderObjectWidget {
   ///
   /// You will get the chosen duration to start playing at which you can pass
   /// on to your media player.
+  ///
+  /// If you want continuous duration updates as the user moves the thumb,
+  /// see [onDragUpdate], where the provided [ThumbDragDetails] has a
+  /// `timeStamp` with the seek duration on it.
   final ValueChanged<Duration>? onSeek;
 
   /// A callback when the user starts to move the thumb.

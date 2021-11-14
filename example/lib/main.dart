@@ -110,8 +110,8 @@ class _HomeWidgetState extends State<HomeWidget> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              SingleChildScrollView(
-                child: Column(
+              Expanded(
+                child: ListView(
                   children: [
                     _themeButtons(),
                     _widgetSizeButtons(),
@@ -137,11 +137,12 @@ class _HomeWidgetState extends State<HomeWidget> {
                   ],
                 ),
               ),
-              const Spacer(),
+              const SizedBox(height: 20),
               Container(
                 decoration: _widgetBorder(),
                 child: _progressBar(),
               ),
+              const SizedBox(height: 20),
               _playButton(),
             ],
           ),

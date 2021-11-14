@@ -1,3 +1,10 @@
+## [0.10.0] - November 14, 2021
+
+- @addie9000: fix thumb position when total changed (#27)
+- @giga10: Drop 0 padding on time labels less than 10 minutes (#24, #25)
+- Update demo app so that buttons don't overflow
+- Updated documentation to clarify how you can getting the thumb duration while the user is in the process of seeking.
+
 ## [0.9.0] - August 12, 2021
 
 - Added `barCapShape` to select `BarCapShape.round` or `BarCapShape.square` for the ends. (#20)
