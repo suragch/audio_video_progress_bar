@@ -512,6 +512,10 @@ class _RenderProgressBar extends RenderBox {
     final barWidth = barEnd - barStart;
     final position = (dx - barStart).clamp(0.0, barWidth);
     _thumbValue = (position / barWidth);
+
+    // Update the progress,
+    // otherwise the progress part of the bar will not repaint when dragging.
+    progress = _currentThumbDuration();
     markNeedsPaint();
   }
 
