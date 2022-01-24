@@ -404,7 +404,8 @@ class _RenderProgressBar extends RenderBox {
     required TimeLabelType timeLabelType,
     TextStyle? timeLabelTextStyle,
     double timeLabelPadding = 0.0,
-  })  : _total = total,
+  })  : _progress = progress,
+        _total = total,
         _buffered = buffered,
         _onSeek = onSeek,
         _onDragStartUserCallback = onDragStart,
@@ -429,10 +430,7 @@ class _RenderProgressBar extends RenderBox {
       ..onUpdate = _onDragUpdate
       ..onEnd = _onDragEnd
       ..onCancel = _finishDrag;
-    if (!_userIsDraggingThumb) {
-      _progress = progress;
-      _thumbValue = _proportionOfTotal(_progress);
-    }
+    _thumbValue = _proportionOfTotal(_progress);
   }
 
   // This is the gesture recognizer used to move the thumb.
@@ -514,7 +512,6 @@ class _RenderProgressBar extends RenderBox {
     final barWidth = barEnd - barStart;
     final position = (dx - barStart).clamp(0.0, barWidth);
     _thumbValue = (position / barWidth);
-    progress = _currentThumbDuration();
     markNeedsPaint();
   }
 
@@ -522,7 +519,7 @@ class _RenderProgressBar extends RenderBox {
   ///
   /// This is used to update the thumb value and the left time label.
   Duration get progress => _progress;
-  Duration _progress = Duration.zero;
+  Duration _progress;
   set progress(Duration value) {
     if (_progress == value) {
       return;
