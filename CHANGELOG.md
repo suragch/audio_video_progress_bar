@@ -1,3 +1,7 @@
+## [0.11.0] - January 24, 2022
+
+- @navaronbracke: Make progress bar and progress time label follow thumb while dragging (#34)
+
 ## [0.10.0] - November 14, 2021
 
 - @addie9000: fix thumb position when total changed (#27)
