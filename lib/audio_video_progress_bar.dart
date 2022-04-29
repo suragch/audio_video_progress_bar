@@ -1029,20 +1029,21 @@ class _RenderProgressBar extends RenderBox {
     if (timeIsNegative) {
       newTime = time.abs();
     }
-
-    final minutes = newTime.inMinutes
-        .remainder(Duration.minutesPerHour)
-        .toString()
-        .padLeft(2, '0');
+    final minutes =
+        newTime.inMinutes.remainder(Duration.minutesPerHour).toString();
     final seconds = newTime.inSeconds
         .remainder(Duration.secondsPerMinute)
         .toString()
         .padLeft(2, '0');
-    final hours = newTime.inHours > 0 ? '${newTime.inHours}:' : '';
+
     if (timeIsNegative) {
-      return "-$hours$minutes:$seconds";
+      return newTime.inHours > 0
+          ? "-${newTime.inHours}:${minutes.padLeft(2, "0")}:$seconds"
+          : "-$minutes:$seconds";
     } else {
-      return "$hours$minutes:$seconds";
+      return newTime.inHours > 0
+          ? "${time.inHours}:${minutes.padLeft(2, "0")}:$seconds"
+          : "$minutes:$seconds";
     }
   }
 
