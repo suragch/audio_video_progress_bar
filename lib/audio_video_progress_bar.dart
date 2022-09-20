@@ -280,6 +280,7 @@ class ProgressBar extends LeafRenderObjectWidget {
       timeLabelType: timeLabelType ?? TimeLabelType.totalTime,
       timeLabelTextStyle: textStyle,
       timeLabelPadding: timeLabelPadding,
+      gestureSettings: MediaQuery.of(context).gestureSettings,
     );
   }
 
@@ -311,7 +312,8 @@ class ProgressBar extends LeafRenderObjectWidget {
       ..timeLabelLocation = timeLabelLocation ?? TimeLabelLocation.below
       ..timeLabelType = timeLabelType ?? TimeLabelType.totalTime
       ..timeLabelTextStyle = textStyle
-      ..timeLabelPadding = timeLabelPadding;
+      ..timeLabelPadding = timeLabelPadding
+      ..gestureSettings = MediaQuery.of(context).gestureSettings;
   }
 
   @override
@@ -404,6 +406,7 @@ class _RenderProgressBar extends RenderBox {
     required TimeLabelType timeLabelType,
     TextStyle? timeLabelTextStyle,
     double timeLabelPadding = 0.0,
+    required DeviceGestureSettings gestureSettings,
   })  : _progress = progress,
         _total = total,
         _buffered = buffered,
@@ -426,15 +429,17 @@ class _RenderProgressBar extends RenderBox {
         _timeLabelTextStyle = timeLabelTextStyle,
         _timeLabelPadding = timeLabelPadding {
     _drag = HorizontalDragGestureRecognizer()
+      ..onDown = _onDragDown
       ..onStart = _onDragStart
       ..onUpdate = _onDragUpdate
       ..onEnd = _onDragEnd
-      ..onCancel = _finishDrag;
+      ..onCancel = _finishDrag
+      ..gestureSettings = gestureSettings;
     _thumbValue = _proportionOfTotal(_progress);
   }
 
   // This is the gesture recognizer used to move the thumb.
-  HorizontalDragGestureRecognizer? _drag;
+  late HorizontalDragGestureRecognizer _drag;
 
   // This is a value between 0.0 and 1.0 used to indicate the position on
   // the bar.
@@ -452,6 +457,16 @@ class _RenderProgressBar extends RenderBox {
   double get _defaultSidePadding {
     const minPadding = 5.0;
     return (_thumbCanPaintOutsideBar) ? thumbRadius + minPadding : minPadding;
+  }
+
+  // The Down event is the first event that is triggered. If null, the gesture
+  // will lose to other gesture recognizers that have handled tap / down.
+  // Also, may be the only event that will be received, if the user tapped,
+  // instead of dragging.
+  void _onDragDown(DragDownDetails details) {
+    _updateThumbPosition(details.localPosition);
+    onSeek?.call(_currentThumbDuration());
+    markNeedsPaint();
   }
 
   void _onDragStart(DragStartDetails details) {
@@ -776,6 +791,11 @@ class _RenderProgressBar extends RenderBox {
     markNeedsLayout();
   }
 
+  DeviceGestureSettings? get gestureSettings => _drag.gestureSettings;
+  set gestureSettings(DeviceGestureSettings? gestureSettings) {
+    _drag.gestureSettings = gestureSettings;
+  }
+
   // The smallest that this widget would ever want to be.
   static const _minDesiredWidth = 100.0;
 
@@ -798,7 +818,7 @@ class _RenderProgressBar extends RenderBox {
   void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
     assert(debugHandleEvent(event, entry));
     if (event is PointerDownEvent) {
-      _drag?.addPointer(event);
+      _drag.addPointer(event);
     }
   }
 
