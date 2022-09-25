@@ -1,16 +1,23 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/basic.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  Widget withMaterialApp({required Widget testWidget}) {
+    return MaterialApp(
+      home: Scaffold(
+        body: testWidget,
+      ),
+    );
+  }
+
   testWidgets('ProgressBar widget exists', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const ProgressBar(
+    await tester.pumpWidget(withMaterialApp(
+      testWidget: const ProgressBar(
         progress: Duration.zero,
         total: Duration(minutes: 5),
       ),
-    );
+    ));
 
     final progressBarFinder = find.byType(ProgressBar);
     expect(progressBarFinder, findsOneWidget);
@@ -18,8 +25,8 @@ void main() {
 
   testWidgets('ProgressBar widget properties exists',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      ProgressBar(
+    await tester.pumpWidget(withMaterialApp(
+      testWidget: ProgressBar(
         progress: Duration.zero,
         total: const Duration(minutes: 5),
         buffered: const Duration(minutes: 1),
@@ -39,9 +46,11 @@ void main() {
         thumbCanPaintOutsideBar: false,
         timeLabelLocation: TimeLabelLocation.sides,
         timeLabelType: TimeLabelType.remainingTime,
-        timeLabelTextStyle: const TextStyle(color: Color(0x00000000)),
+        timeLabelTextStyle: const TextStyle(
+          color: Color(0x00000000),
+        ),
       ),
-    );
+    ));
 
     ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
     expect(progressBar, isNotNull);
@@ -69,15 +78,15 @@ void main() {
 
   testWidgets('TimeLabelLocation.below size correct',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const Center(
+    await tester.pumpWidget(withMaterialApp(
+      testWidget: const Center(
         child: ProgressBar(
           progress: Duration.zero,
           total: Duration(minutes: 5),
           timeLabelLocation: TimeLabelLocation.below,
         ),
       ),
-    );
+    ));
 
     ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
     expect(progressBar, isNotNull);
@@ -89,15 +98,15 @@ void main() {
 
   testWidgets('TimeLabelLocation.above size correct',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const Center(
+    await tester.pumpWidget(withMaterialApp(
+      testWidget: const Center(
         child: ProgressBar(
           progress: Duration.zero,
           total: Duration(minutes: 5),
           timeLabelLocation: TimeLabelLocation.above,
         ),
       ),
-    );
+    ));
 
     ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
     expect(progressBar, isNotNull);
@@ -109,15 +118,15 @@ void main() {
 
   testWidgets('TimeLabelLocation.sides size correct',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const Center(
+    await tester.pumpWidget(withMaterialApp(
+      testWidget: const Center(
         child: ProgressBar(
           progress: Duration.zero,
           total: Duration(minutes: 5),
           timeLabelLocation: TimeLabelLocation.sides,
         ),
       ),
-    );
+    ));
 
     ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
     expect(progressBar, isNotNull);
@@ -129,15 +138,15 @@ void main() {
 
   testWidgets('TimeLabelLocation.none size correct',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const Center(
+    await tester.pumpWidget(withMaterialApp(
+      testWidget: const Center(
         child: ProgressBar(
           progress: Duration.zero,
           total: Duration(minutes: 5),
           timeLabelLocation: TimeLabelLocation.none,
         ),
       ),
-    );
+    ));
 
     ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
     expect(progressBar, isNotNull);
@@ -149,14 +158,14 @@ void main() {
 
   testWidgets('ProgressBar default size is TimeLabelLocation.below',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const Center(
+    await tester.pumpWidget(withMaterialApp(
+      testWidget: const Center(
         child: ProgressBar(
           progress: Duration.zero,
           total: Duration(minutes: 5),
         ),
       ),
-    );
+    ));
 
     ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
     expect(progressBar, isNotNull);
@@ -168,8 +177,8 @@ void main() {
 
   testWidgets('Changing the thumb radius changes the widget size',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const Center(
+    await tester.pumpWidget(withMaterialApp(
+      testWidget: const Center(
         child: ProgressBar(
           progress: Duration.zero,
           total: Duration(minutes: 5),
@@ -177,7 +186,7 @@ void main() {
           timeLabelLocation: TimeLabelLocation.none,
         ),
       ),
-    );
+    ));
 
     ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
     expect(progressBar, isNotNull);
@@ -190,8 +199,8 @@ void main() {
   testWidgets(
       'The height is the max of the font and thumb radius for TimeLabelLocation.sides',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const Center(
+    await tester.pumpWidget(withMaterialApp(
+      testWidget: const Center(
         child: ProgressBar(
           progress: Duration.zero,
           total: Duration(minutes: 5),
@@ -199,7 +208,7 @@ void main() {
           timeLabelLocation: TimeLabelLocation.sides,
         ),
       ),
-    );
+    ));
 
     ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
     expect(progressBar, isNotNull);
@@ -212,8 +221,8 @@ void main() {
   group('timeLabelPadding -', () {
     testWidgets('Size with timeLabelPadding is correct when labels below',
         (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const Center(
+      await tester.pumpWidget(withMaterialApp(
+        testWidget: const Center(
           child: ProgressBar(
             progress: Duration.zero,
             total: Duration(minutes: 5),
@@ -221,7 +230,7 @@ void main() {
             timeLabelLocation: TimeLabelLocation.below,
           ),
         ),
-      );
+      ));
 
       ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
       expect(progressBar, isNotNull);
@@ -233,8 +242,8 @@ void main() {
 
     testWidgets('Size with timeLabelPadding is correct when labels above',
         (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const Center(
+      await tester.pumpWidget(withMaterialApp(
+        testWidget: const Center(
           child: ProgressBar(
             progress: Duration.zero,
             total: Duration(minutes: 5),
@@ -242,7 +251,7 @@ void main() {
             timeLabelLocation: TimeLabelLocation.above,
           ),
         ),
-      );
+      ));
 
       ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
       expect(progressBar, isNotNull);
@@ -254,8 +263,8 @@ void main() {
 
     testWidgets('Size with timeLabelPadding is correct when labels on sides',
         (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const Center(
+      await tester.pumpWidget(withMaterialApp(
+        testWidget: const Center(
           child: ProgressBar(
             progress: Duration.zero,
             total: Duration(minutes: 5),
@@ -263,7 +272,7 @@ void main() {
             timeLabelLocation: TimeLabelLocation.sides,
           ),
         ),
-      );
+      ));
 
       ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
       expect(progressBar, isNotNull);
@@ -275,8 +284,8 @@ void main() {
 
     testWidgets('Size with timeLabelPadding is correct when no labels',
         (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const Center(
+      await tester.pumpWidget(withMaterialApp(
+        testWidget: const Center(
           child: ProgressBar(
             progress: Duration.zero,
             total: Duration(minutes: 5),
@@ -284,7 +293,7 @@ void main() {
             timeLabelLocation: TimeLabelLocation.none,
           ),
         ),
-      );
+      ));
 
       ProgressBar progressBar = tester.firstWidget(find.byType(ProgressBar));
       expect(progressBar, isNotNull);
@@ -302,8 +311,8 @@ void main() {
       int dragStartCount = 0;
       int dragUpdateCount = 0;
       int dragEndCount = 0;
-      await tester.pumpWidget(
-        ProgressBar(
+      await tester.pumpWidget(withMaterialApp(
+        testWidget: ProgressBar(
           progress: Duration.zero,
           total: const Duration(minutes: 5),
           onSeek: (duration) {
@@ -319,7 +328,7 @@ void main() {
             dragEndCount++;
           },
         ),
-      );
+      ));
 
       // drag from the middle of the widget to the far left side
       await tester.drag(find.byType(ProgressBar), const Offset(-100, 0));
@@ -334,8 +343,8 @@ void main() {
       Duration onSeekDuration = const Duration(seconds: 1);
       Duration onDragStartDuration = const Duration(seconds: 1);
       List<Duration> onDragUpdateDurations = [];
-      await tester.pumpWidget(
-        Center(
+      await tester.pumpWidget(withMaterialApp(
+        testWidget: Center(
           child: SizedBox(
             width: 200,
             child: ProgressBar(
@@ -353,7 +362,7 @@ void main() {
             ),
           ),
         ),
-      );
+      ));
 
       // drag from the middle of the widget to the far left side
       await tester.drag(find.byType(ProgressBar), const Offset(-100, 0));
@@ -368,8 +377,8 @@ void main() {
         (WidgetTester tester) async {
       ThumbDragDetails onDragStartDetails = const ThumbDragDetails();
       List<ThumbDragDetails> onDragDetails = [];
-      await tester.pumpWidget(
-        Center(
+      await tester.pumpWidget(withMaterialApp(
+        testWidget: Center(
           child: SizedBox(
             width: 200,
             child: ProgressBar(
@@ -384,7 +393,7 @@ void main() {
             ),
           ),
         ),
-      );
+      ));
 
       // drag from the middle of the widget to the far left side
       await tester.drag(find.byType(ProgressBar), const Offset(-100, 0));
