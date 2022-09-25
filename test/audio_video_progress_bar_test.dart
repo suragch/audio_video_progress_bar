@@ -334,7 +334,7 @@ void main() {
       await tester.drag(find.byType(ProgressBar), const Offset(-100, 0));
       expect(seekCount, 1);
       expect(dragStartCount, 1);
-      expect(dragUpdateCount, 2);
+      expect(dragUpdateCount, 1);
       expect(dragEndCount, 1);
     });
 
@@ -367,10 +367,9 @@ void main() {
       // drag from the middle of the widget to the far left side
       await tester.drag(find.byType(ProgressBar), const Offset(-100, 0));
       expect(onSeekDuration, Duration.zero);
-      expect(onDragStartDuration, const Duration(minutes: 2, seconds: 30));
-      expect(onDragUpdateDurations[0],
+      expect(onDragStartDuration,
           const Duration(minutes: 1, seconds: 59, milliseconds: 231));
-      expect(onDragUpdateDurations[1], Duration.zero);
+      expect(onDragUpdateDurations[0], Duration.zero);
     });
 
     testWidgets('callbacks have accurate position values for no side labels',
@@ -397,12 +396,285 @@ void main() {
 
       // drag from the middle of the widget to the far left side
       await tester.drag(find.byType(ProgressBar), const Offset(-100, 0));
-      expect(onDragStartDetails.globalPosition, const Offset(400.0, 300.0));
-      expect(onDragStartDetails.localPosition, const Offset(100.0, 17.0));
-      expect(onDragDetails[0].globalPosition, const Offset(380.0, 300.0));
-      expect(onDragDetails[0].localPosition, const Offset(80.0, 17.0));
-      expect(onDragDetails[1].globalPosition, const Offset(300.0, 300.0));
-      expect(onDragDetails[1].localPosition, const Offset(0.0, 17.0));
+      expect(onDragStartDetails.globalPosition, const Offset(380.0, 300.0));
+      expect(onDragStartDetails.localPosition, const Offset(80.0, 17.0));
+      expect(onDragDetails[0].globalPosition, const Offset(300.0, 300.0));
+      expect(onDragDetails[0].localPosition, const Offset(0.0, 17.0));
+    });
+  });
+
+  group('Tap callbacks', () {
+    testWidgets('methods called the right number of times on tap',
+        (WidgetTester tester) async {
+      int seekCount = 0;
+      int dragStartCount = 0;
+      int dragUpdateCount = 0;
+      int dragEndCount = 0;
+      int tapCount = 0;
+      await tester.pumpWidget(withMaterialApp(
+        testWidget: ProgressBar(
+          progress: Duration.zero,
+          total: const Duration(minutes: 5),
+          onSeek: (duration) {
+            seekCount++;
+          },
+          onDragStart: (details) {
+            dragStartCount++;
+          },
+          onDragUpdate: (details) {
+            dragUpdateCount++;
+          },
+          onDragEnd: () {
+            dragEndCount++;
+          },
+          onTap: () {
+            tapCount++;
+          },
+        ),
+      ));
+
+      await tester.tap(find.byType(ProgressBar));
+      expect(seekCount, 1);
+      expect(dragStartCount, 0);
+      expect(dragUpdateCount, 0);
+      expect(dragEndCount, 0);
+      expect(tapCount, 1);
+    });
+
+    testWidgets('Taps have accurate duration values',
+        (WidgetTester tester) async {
+      Duration onSeekDuration = const Duration(seconds: 1);
+      await tester.pumpWidget(withMaterialApp(
+        testWidget: Center(
+          child: SizedBox(
+            width: 200,
+            child: ProgressBar(
+              progress: Duration.zero,
+              total: const Duration(minutes: 5),
+              onSeek: (duration) {
+                onSeekDuration = duration;
+              },
+            ),
+          ),
+        ),
+      ));
+
+      await tester.tap(find.byType(ProgressBar));
+      expect(onSeekDuration, const Duration(minutes: 2, seconds: 30));
+    });
+
+    testWidgets(
+        'When seekOnTap is false,'
+        ' taps call methods the right number of times',
+        (WidgetTester tester) async {
+      int seekCount = 0;
+      int dragStartCount = 0;
+      int dragUpdateCount = 0;
+      int dragEndCount = 0;
+      int tapCount = 0;
+      await tester.pumpWidget(withMaterialApp(
+        testWidget: ProgressBar(
+          progress: Duration.zero,
+          total: const Duration(minutes: 5),
+          onSeek: (duration) {
+            seekCount++;
+          },
+          onDragStart: (details) {
+            dragStartCount++;
+          },
+          onDragUpdate: (details) {
+            dragUpdateCount++;
+          },
+          onDragEnd: () {
+            dragEndCount++;
+          },
+          onTap: () {
+            tapCount++;
+          },
+          seekOnTap: false,
+        ),
+      ));
+
+      await tester.tap(find.byType(ProgressBar));
+      expect(seekCount, 0);
+      expect(dragStartCount, 0);
+      expect(dragUpdateCount, 0);
+      expect(dragEndCount, 0);
+      expect(tapCount, 1);
+    });
+
+    testWidgets('When seekOnTap is false, taps have accurate duration values',
+        (WidgetTester tester) async {
+      Duration onSeekDuration = const Duration(seconds: 1);
+      await tester.pumpWidget(withMaterialApp(
+        testWidget: Center(
+          child: SizedBox(
+            width: 200,
+            child: ProgressBar(
+              progress: Duration.zero,
+              total: const Duration(minutes: 5),
+              onSeek: (duration) {
+                onSeekDuration = duration;
+              },
+              seekOnTap: false,
+            ),
+          ),
+        ),
+      ));
+
+      await tester.tap(find.byType(ProgressBar));
+      expect(onSeekDuration, const Duration(seconds: 1));
+    });
+  });
+  group('drag callbacks in composite widgets', () {
+    testWidgets('methods called the right number of times in composite widgets',
+        (WidgetTester tester) async {
+      int seekCount = 0;
+      int dragStartCount = 0;
+      int dragUpdateCount = 0;
+      int dragEndCount = 0;
+      int tapCount = 0;
+      await tester.pumpWidget(withMaterialApp(
+        testWidget: GestureDetector(
+          onTap: () => debugPrint('Tap on Gesture Detector'),
+          onHorizontalDragStart: (_) => debugPrint('Drag on Gesture Detector'),
+          child: ProgressBar(
+            progress: Duration.zero,
+            total: const Duration(minutes: 5),
+            onSeek: (duration) {
+              seekCount++;
+            },
+            onDragStart: (details) {
+              dragStartCount++;
+            },
+            onDragUpdate: (details) {
+              dragUpdateCount++;
+            },
+            onDragEnd: () {
+              dragEndCount++;
+            },
+            onTap: () {
+              tapCount++;
+            },
+          ),
+        ),
+      ));
+
+      // drag from the middle of the widget to the far left side
+      await tester.drag(find.byType(ProgressBar), const Offset(-100, 0));
+      expect(seekCount, 1);
+      expect(dragStartCount, 1);
+      expect(dragUpdateCount, 1);
+      expect(dragEndCount, 1);
+      expect(tapCount, 0);
+    });
+
+    testWidgets('callbacks have accurate duration values in composite widgets',
+        (WidgetTester tester) async {
+      Duration onSeekDuration = const Duration(seconds: 1);
+      Duration onDragStartDuration = const Duration(seconds: 1);
+      List<Duration> onDragUpdateDurations = [];
+      await tester.pumpWidget(withMaterialApp(
+        testWidget: Center(
+          child: GestureDetector(
+            onTap: () => debugPrint('Tap on Gesture Detector'),
+            onHorizontalDragStart: (_) =>
+                debugPrint('Drag on Gesture Detector'),
+            child: SizedBox(
+              width: 200,
+              child: ProgressBar(
+                progress: Duration.zero,
+                total: const Duration(minutes: 5),
+                onSeek: (duration) {
+                  onSeekDuration = duration;
+                },
+                onDragStart: (details) {
+                  onDragStartDuration = details.timeStamp;
+                },
+                onDragUpdate: (details) {
+                  onDragUpdateDurations.add(details.timeStamp);
+                },
+              ),
+            ),
+          ),
+        ),
+      ));
+
+      // drag from the middle of the widget to the far left side
+      await tester.drag(find.byType(ProgressBar), const Offset(-100, 0));
+      expect(onSeekDuration, Duration.zero);
+      expect(onDragStartDuration,
+          const Duration(minutes: 1, seconds: 59, milliseconds: 231));
+      expect(onDragUpdateDurations[0], Duration.zero);
+    });
+  });
+
+  group('Tap callbacks in composite widgets', () {
+    testWidgets('methods called the right number of times on tap',
+        (WidgetTester tester) async {
+      int seekCount = 0;
+      int dragStartCount = 0;
+      int dragUpdateCount = 0;
+      int dragEndCount = 0;
+      int tapCount = 0;
+      await tester.pumpWidget(withMaterialApp(
+        testWidget: GestureDetector(
+          onTap: () => debugPrint('Tap on Gesture Detector'),
+          onHorizontalDragStart: (_) => debugPrint('Drag on Gesture Detector'),
+          child: ProgressBar(
+            progress: Duration.zero,
+            total: const Duration(minutes: 5),
+            onSeek: (duration) {
+              seekCount++;
+            },
+            onDragStart: (details) {
+              dragStartCount++;
+            },
+            onDragUpdate: (details) {
+              dragUpdateCount++;
+            },
+            onDragEnd: () {
+              dragEndCount++;
+            },
+            onTap: () {
+              tapCount++;
+            },
+          ),
+        ),
+      ));
+
+      await tester.tap(find.byType(ProgressBar));
+      expect(seekCount, 1);
+      expect(dragStartCount, 0);
+      expect(dragUpdateCount, 0);
+      expect(dragEndCount, 0);
+      expect(tapCount, 1);
+    });
+
+    testWidgets('Taps have accurate duration values',
+        (WidgetTester tester) async {
+      Duration onSeekDuration = const Duration(seconds: 1);
+      await tester.pumpWidget(withMaterialApp(
+        testWidget: Center(
+          child: GestureDetector(
+            onTap: () => debugPrint('Tap on Gesture Detector'),
+            onHorizontalDragStart: (_) =>
+                debugPrint('Drag on Gesture Detector'),
+            child: SizedBox(
+              width: 200,
+              child: ProgressBar(
+                progress: Duration.zero,
+                total: const Duration(minutes: 5),
+                onSeek: (duration) {
+                  onSeekDuration = duration;
+                },
+              ),
+            ),
+          ),
+        ),
+      ));
+      await tester.tap(find.byType(ProgressBar));
+      expect(onSeekDuration, const Duration(minutes: 2, seconds: 30));
     });
   });
 }
