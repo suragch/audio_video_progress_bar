@@ -381,6 +381,18 @@ class ThumbDragDetails {
       'local: $localPosition)';
 }
 
+class EagerHorizontalDragGestureRecognizer
+    extends HorizontalDragGestureRecognizer {
+  @override
+  void addAllowedPointer(PointerDownEvent event) {
+    super.addAllowedPointer(event);
+    resolve(GestureDisposition.accepted);
+  }
+
+  @override
+  String get debugDescription => 'EagerHorizontalGestureRecognizer';
+}
+
 class _RenderProgressBar extends RenderBox {
   _RenderProgressBar({
     required Duration progress,
@@ -425,7 +437,7 @@ class _RenderProgressBar extends RenderBox {
         _timeLabelType = timeLabelType,
         _timeLabelTextStyle = timeLabelTextStyle,
         _timeLabelPadding = timeLabelPadding {
-    _drag = HorizontalDragGestureRecognizer()
+    _drag = EagerHorizontalDragGestureRecognizer()
       ..onStart = _onDragStart
       ..onUpdate = _onDragUpdate
       ..onEnd = _onDragEnd
@@ -434,7 +446,7 @@ class _RenderProgressBar extends RenderBox {
   }
 
   // This is the gesture recognizer used to move the thumb.
-  HorizontalDragGestureRecognizer? _drag;
+  EagerHorizontalDragGestureRecognizer? _drag;
 
   // This is a value between 0.0 and 1.0 used to indicate the position on
   // the bar.
