@@ -1,6 +1,6 @@
 ## [0.11.0] - Unpublished
 
-- @thesensibledev: fix horizontal drag and tap gesture detection when competing with other widgets (#45, #44, #39, #31, #23)
+- @Hwan-seok and @thesensibledev: fix horizontal drag and tap gesture detection when competing with other widgets (#44, #39, #31, #23)
 - @thesensibledev: update Android folder in example project (#42)
 
 ## [0.10.0] - November 14, 2021
