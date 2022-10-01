@@ -82,8 +82,6 @@ class ProgressBar extends LeafRenderObjectWidget {
     this.onDragStart,
     this.onDragUpdate,
     this.onDragEnd,
-    this.onTap,
-    this.seekOnTap = true,
     this.barHeight = 5.0,
     this.baseBarColor,
     this.progressBarColor,
@@ -125,10 +123,6 @@ class ProgressBar extends LeafRenderObjectWidget {
   /// If you want continuous duration updates as the user moves the thumb,
   /// see [onDragUpdate], where the provided [ThumbDragDetails] has a
   /// `timeStamp` with the seek duration on it.
-  ///
-  /// By default, this callback will also be invoked for tap events, with the
-  /// duration set based on the tap location. If this behavior of seeking on tap
-  /// is not desired, set the [seekOnTap] toggle to false.
   final ValueChanged<Duration>? onSeek;
 
   /// A callback when the user starts to move the thumb.
@@ -171,34 +165,6 @@ class ProgressBar extends LeafRenderObjectWidget {
   ///
   /// This method is called directly before [onSeek].
   final VoidCallback? onDragEnd;
-
-  /// A callback when the user finishes tapping on the progress bar.
-  ///
-  /// This is called only once when the tap gesture is considered complete.
-  /// (E.g. When the user tapped  without dragging or the user clicked with the
-  /// primary pointing device, such as a mouse.)
-  ///
-  /// The behavior of this callback is not impacted by [seekOnTap].
-  /// But if [seekOnTap] is set to true, the [onTap] will be invoked before
-  /// [onSeek]
-  final VoidCallback? onTap;
-
-  /// Whether a tap on the progress bar will cause the tracking thumb to move
-  /// to the location of the tap and cause the onSeek to be invoked.
-  ///
-  /// The default is `true` and this means that a tap will cause the thumb to
-  /// move and invoke an onSeek when the tap gesture is completed.
-  ///
-  /// This doesn't impact the drag behavior. Therefore, if the user taps and
-  /// then drags, the tracking thumb will follow the drag and invoke the drag
-  /// callbacks.
-  ///
-  /// It is useful to set this to 'false', if accidental taping on the progress
-  /// bar should not result in invoking a seeking / dragging behavior. It is
-  /// also useful to implement alternative interactions such as displaying a
-  /// more detailed progress bar, on tap and resetting it to a collapsed
-  /// or mini version by default.
-  final bool seekOnTap;
 
   /// The vertical thickness of the progress bar.
   final double barHeight;
@@ -299,8 +265,6 @@ class ProgressBar extends LeafRenderObjectWidget {
       onDragStart: onDragStart,
       onDragUpdate: onDragUpdate,
       onDragEnd: onDragEnd,
-      onTap: onTap,
-      seekOnTap: seekOnTap,
       barHeight: barHeight,
       baseBarColor: baseBarColor ?? primaryColor.withOpacity(0.24),
       progressBarColor: progressBarColor ?? primaryColor,
@@ -316,7 +280,6 @@ class ProgressBar extends LeafRenderObjectWidget {
       timeLabelType: timeLabelType ?? TimeLabelType.totalTime,
       timeLabelTextStyle: textStyle,
       timeLabelPadding: timeLabelPadding,
-      gestureSettings: MediaQuery.of(context).gestureSettings,
     );
   }
 
@@ -334,8 +297,6 @@ class ProgressBar extends LeafRenderObjectWidget {
       ..onDragStart = onDragStart
       ..onDragUpdate = onDragUpdate
       ..onDragEnd = onDragEnd
-      ..onTap = onTap
-      ..seekOnTap = seekOnTap
       ..barHeight = barHeight
       ..baseBarColor = baseBarColor ?? primaryColor.withOpacity(0.24)
       ..progressBarColor = progressBarColor ?? primaryColor
@@ -350,8 +311,7 @@ class ProgressBar extends LeafRenderObjectWidget {
       ..timeLabelLocation = timeLabelLocation ?? TimeLabelLocation.below
       ..timeLabelType = timeLabelType ?? TimeLabelType.totalTime
       ..timeLabelTextStyle = textStyle
-      ..timeLabelPadding = timeLabelPadding
-      ..gestureSettings = MediaQuery.of(context).gestureSettings;
+      ..timeLabelPadding = timeLabelPadding;
   }
 
   @override
@@ -370,17 +330,6 @@ class ProgressBar extends LeafRenderObjectWidget {
         ifNull: 'unimplemented'));
     properties.add(ObjectFlagProperty<VoidCallback>('onDragEnd', onDragEnd,
         ifNull: 'unimplemented'));
-    properties.add(ObjectFlagProperty<VoidCallback>('onTap', onTap,
-        ifNull: 'unimplemented'));
-    properties.add(
-      FlagProperty(
-        'seekOnTap',
-        value: seekOnTap,
-        ifTrue: 'will call onSeek when tapped',
-        ifFalse: "won't call onSeek when tapped",
-        showName: true,
-      ),
-    );
     properties.add(DoubleProperty('barHeight', barHeight));
     properties.add(ColorProperty('baseBarColor', baseBarColor));
     properties.add(ColorProperty('progressBarColor', progressBarColor));
@@ -390,15 +339,8 @@ class ProgressBar extends LeafRenderObjectWidget {
     properties.add(ColorProperty('thumbColor', thumbColor));
     properties.add(ColorProperty('thumbGlowColor', thumbGlowColor));
     properties.add(DoubleProperty('thumbGlowRadius', thumbGlowRadius));
-    properties.add(
-      FlagProperty(
-        'thumbCanPaintOutsideBar',
-        value: thumbCanPaintOutsideBar,
-        ifTrue: 'true',
-        ifFalse: 'false',
-        showName: true,
-      ),
-    );
+    properties.add(FlagProperty('thumbCanPaintOutsideBar',
+        value: thumbCanPaintOutsideBar));
     properties
         .add(StringProperty('timeLabelLocation', timeLabelLocation.toString()));
     properties.add(StringProperty('timeLabelType', timeLabelType.toString()));
@@ -448,8 +390,6 @@ class _RenderProgressBar extends RenderBox {
     ThumbDragStartCallback? onDragStart,
     ThumbDragUpdateCallback? onDragUpdate,
     VoidCallback? onDragEnd,
-    VoidCallback? onTap,
-    required bool seekOnTap,
     required double barHeight,
     required Color baseBarColor,
     required Color progressBarColor,
@@ -464,7 +404,6 @@ class _RenderProgressBar extends RenderBox {
     required TimeLabelType timeLabelType,
     TextStyle? timeLabelTextStyle,
     double timeLabelPadding = 0.0,
-    required DeviceGestureSettings gestureSettings,
   })  : _progress = progress,
         _total = total,
         _buffered = buffered,
@@ -472,8 +411,6 @@ class _RenderProgressBar extends RenderBox {
         _onDragStartUserCallback = onDragStart,
         _onDragUpdateUserCallback = onDragUpdate,
         _onDragEndUserCallback = onDragEnd,
-        _onTapUserCallback = onTap,
-        _seekOnTap = seekOnTap,
         _barHeight = barHeight,
         _baseBarColor = baseBarColor,
         _progressBarColor = progressBarColor,
@@ -492,19 +429,12 @@ class _RenderProgressBar extends RenderBox {
       ..onStart = _onDragStart
       ..onUpdate = _onDragUpdate
       ..onEnd = _onDragEnd
-      ..onCancel = _finishDrag
-      ..gestureSettings = gestureSettings;
-    _tap = TapGestureRecognizer()
-      ..onTapUp = _onTapUp
-      ..gestureSettings = gestureSettings;
+      ..onCancel = _finishDrag;
     _thumbValue = _proportionOfTotal(_progress);
   }
 
   // This is the gesture recognizer used to move the thumb.
-  late HorizontalDragGestureRecognizer _drag;
-
-  // This is the gesture recognizer used to detect taps on the bar.
-  late TapGestureRecognizer _tap;
+  HorizontalDragGestureRecognizer? _drag;
 
   // This is a value between 0.0 and 1.0 used to indicate the position on
   // the bar.
@@ -552,17 +482,6 @@ class _RenderProgressBar extends RenderBox {
   void _finishDrag() {
     _userIsDraggingThumb = false;
     markNeedsPaint();
-  }
-
-  // Call onTap first and then check if the seekOnTap is requested.
-  // If 'true' then update the thumb position and invoke the onSeek callback.
-  void _onTapUp(TapUpDetails details) {
-    onTap?.call();
-    if (_seekOnTap) {
-      _updateThumbPosition(details.localPosition);
-      onSeek?.call(_currentThumbDuration());
-      markNeedsPaint();
-    }
   }
 
   Duration _currentThumbDuration() {
@@ -726,24 +645,6 @@ class _RenderProgressBar extends RenderBox {
     _onDragEndUserCallback = value;
   }
 
-  /// A callback when the bar is tapped
-  VoidCallback? get onTap => _onTapUserCallback;
-  VoidCallback? _onTapUserCallback;
-  set onTap(VoidCallback? value) {
-    if (value == _onTapUserCallback) {
-      return;
-    }
-    _onTapUserCallback = value;
-  }
-
-  /// A toggle to enable the onSeek callback on tap along with thumb tracking.
-  bool get seekOnTap => _seekOnTap;
-  bool _seekOnTap;
-  set seekOnTap(bool value) {
-    if (_seekOnTap == value) return;
-    _seekOnTap = value;
-  }
-
   /// The vertical thickness of the bar that the thumb moves along.
   double get barHeight => _barHeight;
   double _barHeight;
@@ -875,11 +776,6 @@ class _RenderProgressBar extends RenderBox {
     markNeedsLayout();
   }
 
-  DeviceGestureSettings? get gestureSettings => _drag.gestureSettings;
-  set gestureSettings(DeviceGestureSettings? gestureSettings) {
-    _drag.gestureSettings = gestureSettings;
-  }
-
   // The smallest that this widget would ever want to be.
   static const _minDesiredWidth = 100.0;
 
@@ -902,8 +798,7 @@ class _RenderProgressBar extends RenderBox {
   void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
     assert(debugHandleEvent(event, entry));
     if (event is PointerDownEvent) {
-      _drag.addPointer(event);
-      _tap.addPointer(event);
+      _drag?.addPointer(event);
     }
   }
 
