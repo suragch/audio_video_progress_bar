@@ -1,7 +1,8 @@
-## [0.11.0] - Unpublished
+## [0.11.0] - October 7, 2022
 
 - @Hwan-seok and @thesensibledev: fix horizontal drag and tap gesture detection when competing with other widgets (#44, #39, #31, #23)
 - @thesensibledev: update Android folder in example project (#42)
+- @thesensibledev: fix widget tree not displaying in devtool 
 
 ## [0.10.0] - November 14, 2021
 
