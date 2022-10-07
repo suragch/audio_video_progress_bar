@@ -338,8 +338,15 @@ class ProgressBar extends LeafRenderObjectWidget {
     properties.add(ColorProperty('thumbColor', thumbColor));
     properties.add(ColorProperty('thumbGlowColor', thumbGlowColor));
     properties.add(DoubleProperty('thumbGlowRadius', thumbGlowRadius));
-    properties.add(FlagProperty('thumbCanPaintOutsideBar',
-        value: thumbCanPaintOutsideBar));
+    properties.add(
+      FlagProperty(
+        'thumbCanPaintOutsideBar',
+        value: thumbCanPaintOutsideBar,
+        ifTrue: 'true',
+        ifFalse: 'false',
+        showName: true,
+      ),
+    );
     properties
         .add(StringProperty('timeLabelLocation', timeLabelLocation.toString()));
     properties.add(StringProperty('timeLabelType', timeLabelType.toString()));
