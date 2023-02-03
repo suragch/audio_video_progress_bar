@@ -3,6 +3,7 @@
 - Bump to stable release versioning
 - Draw progress bar to match thumb drag location (@navaronbracke) (#34)
 - Update current progress label while dragging thumb
+- Rename `textTheme.bodyText1` to `textTheme.bodyLarge`
 
 ## [0.11.0] - October 7, 2022
 

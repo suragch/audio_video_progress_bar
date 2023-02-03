@@ -255,7 +255,7 @@ class _FullExampleState extends State<FullExample> {
   }
 
   Wrap _labelSizeButtons() {
-    final fontColor = Theme.of(context).textTheme.bodyText1?.color;
+    final fontColor = Theme.of(context).textTheme.bodyLarge?.color;
     return Wrap(children: [
       OutlinedButton(
         child: const Text('standard font size'),
