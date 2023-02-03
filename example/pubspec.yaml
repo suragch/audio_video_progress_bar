@@ -1,8 +1,6 @@
 name: audio_video_progress_bar_example
 description: Demonstrates how to use the audio_video_progress_bar plugin.
-
-# The following line prevents the package from being accidentally published to
-# pub.dev using `pub publish`. This is preferred for private packages.
+version: 1.0.0
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 environment:
@@ -13,11 +11,11 @@ dependencies:
     sdk: flutter
   audio_video_progress_bar:
     path: ../
-  just_audio: ^0.9.5
-  rxdart: ^0.27.0
+  just_audio: ^0.9.31
+  rxdart: ^0.27.7
 
 dev_dependencies:
-  flutter_lints: ^1.0.3
+  flutter_lints: ^2.0.1
   flutter_test:
     sdk: flutter
 

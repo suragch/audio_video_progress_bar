@@ -1,3 +1,9 @@
+## [1.0.0] - February 3, 2023
+
+- Bump to stable release versioning
+- Draw progress bar to match thumb drag location (@navaronbracke) (#34)
+- Update current progress label while dragging thumb
+
 ## [0.11.0] - October 7, 2022
 
 - @Hwan-seok and @thesensibledev: fix horizontal drag and tap gesture detection when competing with other widgets (#44, #39, #31, #23)
