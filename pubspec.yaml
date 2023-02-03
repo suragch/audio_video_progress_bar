@@ -18,3 +18,15 @@ dev_dependencies:
     sdk: flutter
 
 flutter: null
+
+screenshots:
+  - description: 'Examples of a working progress bar.'
+    path: supplemental/progress_bar_demo.gif
+  - description: 'Progress bar with a custom theme.'
+    path: supplemental/custom_theme.png
+  - description: 'Progress bar with a custom dark theme.'
+    path: supplemental/dark_theme.png
+  - description: 'Using a progress bar (play button not included).'
+    path: supplemental/progress_bar_demo_with_buttons.gif
+  - description: 'Progress bar with side labels.'
+    path: supplemental/side_labels.png
