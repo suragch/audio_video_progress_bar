@@ -1027,7 +1027,7 @@ class _RenderProgressBar extends RenderBox {
     Duration newTime = time;
     bool timeIsNegative = time.isNegative;
     if (timeIsNegative) {
-      newTime = time.abs();
+      newTime = "0:00";
     }
     final minutes =
         newTime.inMinutes.remainder(Duration.minutesPerHour).toString();
