@@ -1041,13 +1041,16 @@ class _RenderProgressBar extends RenderBox {
   }
 
   double _proportionOfTotal(Duration duration) {
-    if (total.inMilliseconds == 0) {
+    if (total.inMilliseconds == 0 || duration.isNegative) {
       return 0.0;
     }
     return duration.inMilliseconds / total.inMilliseconds;
   }
 
   String _getTimeString(Duration time) {
+    if (time.isNegative) {
+      return '0:00';
+    }
     final minutes =
         time.inMinutes.remainder(Duration.minutesPerHour).toString();
     final seconds = time.inSeconds
