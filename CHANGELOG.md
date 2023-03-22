@@ -1,3 +1,7 @@
+## [1.0.1] - March 22, 2023
+
+-  Fix String format when Duration is negative (@swiftymf) (#38) 
+
 ## [1.0.0] - February 3, 2023
 
 - Bump to stable release versioning
