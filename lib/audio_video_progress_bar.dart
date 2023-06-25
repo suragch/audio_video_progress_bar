@@ -25,6 +25,12 @@ enum TimeLabelLocation {
   ///  | 01:23 -------O---------------- 05:00 |
   sides,
 
+  ///  The time is displayed below the progress bar and without first label.
+  ///
+  ///  | -------O---------------- |
+  ///  |          05:00           |
+  noProgress,
+
   ///  The time is not displayed.
   ///
   ///  | -------O---------------- |
@@ -96,7 +102,11 @@ class ProgressBar extends LeafRenderObjectWidget {
     this.timeLabelType,
     this.timeLabelTextStyle,
     this.timeLabelPadding = 0.0,
+    this.hideProgress = false,
   }) : super(key: key);
+
+  /// user override for hiding the progress indicator
+  final bool hideProgress ;
 
   /// The elapsed playing time of the media.
   ///
@@ -910,19 +920,15 @@ class _RenderProgressBar extends RenderBox {
     // whether to paint the labels below the progress bar or above it
     final isLabelBelow = _timeLabelLocation == TimeLabelLocation.below;
 
-    // current time label
-    final labelDy = (isLabelBelow) ? barHeight + _timeLabelPadding : 0.0;
-    final leftLabelOffset = Offset(0, labelDy);
-    _leftTimeLabel().paint(canvas, leftLabelOffset);
-
     // total or remaining time label
-    final rightLabelDx = size.width - _rightLabelSize.width;
+    final rightLabel = _rightTimeLabel();
+    final rightLabelDx = (barWidth - rightLabel.width) / 2; // Center the label
+    final labelDy = (isLabelBelow) ? barHeight + _timeLabelPadding : 0.0;
     final rightLabelOffset = Offset(rightLabelDx, labelDy);
-    _rightTimeLabel().paint(canvas, rightLabelOffset);
+    rightLabel.paint(canvas, rightLabelOffset);
 
     // progress bar
-    final barDy =
-        (isLabelBelow) ? 0.0 : _leftLabelSize.height + _timeLabelPadding;
+    final barDy = (isLabelBelow) ? 0.0 : rightLabel.height + _timeLabelPadding;
     _drawProgressBar(canvas, Offset(0, barDy), Size(barWidth, barHeight));
   }
 
@@ -966,6 +972,32 @@ class _RenderProgressBar extends RenderBox {
     final barHeight = 2 * _thumbRadius;
     _drawProgressBar(canvas, Offset.zero, Size(barWidth, barHeight));
   }
+
+
+  // ///  The time is displayed below the progress bar and without first label.
+  // ///
+  // ///  | -------O---------------- |
+  // ///  |          05:00           |
+  // void _drawProgressBarWithoutProgressLabel(Canvas canvas) {
+  //   // calculate sizes
+  //   final barWidth = size.width;
+  //   final barHeight = _heightWhenNoLabels();
+  //
+  //   // whether to paint the labels below the progress bar or above it
+  //   final isLabelBelow = _timeLabelLocation == TimeLabelLocation.below;
+  //   final isProgressRemoved = _timeLabelLocation == TimeLabelLocation.noProgress;
+  //
+  //   // total or remaining time label
+  //   final rightLabel = _rightTimeLabel();
+  //   final rightLabelDx = (barWidth - rightLabel.width) / 2; // Center the label
+  //   final labelDy = (isProgressRemoved) ? barHeight + _timeLabelPadding : 0.0;
+  //   final rightLabelOffset = Offset(rightLabelDx, labelDy);
+  //   rightLabel.paint(canvas, rightLabelOffset);
+  //
+  //   // progress bar
+  //   final barDy = (isLabelBelow) ? 0.0 : rightLabel.height + _timeLabelPadding;
+  //   _drawProgressBar(canvas, Offset(0, barDy), Size(barWidth, barHeight));
+  // }
 
   void _drawProgressBar(Canvas canvas, Offset offset, Size localSize) {
     canvas.save();
