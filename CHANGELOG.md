@@ -2,6 +2,7 @@
 
 - Bump to Dart 3.0 and Flutter 3.0.
 - Fix time label overflow (#60).
+- Clamp buffered and progress within total range (#59).
 
 ## [1.0.1] - March 22, 2023
 

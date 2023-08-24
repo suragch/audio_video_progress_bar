@@ -3,6 +3,12 @@ description: A progress bar widget to show or change the position of an audio or
   video stream.
 version: 2.0.0
 homepage: https://github.com/suragch/audio_video_progress_bar
+funding:
+  - https://www.buymeacoffee.com/suragchdev
+topics:
+  - audio
+  - video
+  - progress-bar
 
 environment:
   sdk: ^3.0.0

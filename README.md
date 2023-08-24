@@ -2,7 +2,7 @@
 
 A progress bar widget to show or change the position of an audio or video stream.
 
-![](https://github.com/suragch/audio_video_progress_bar/blob/master/supplemental/progress_bar_demo.gif)
+![](./supplemental/progress_bar_demo.gif)
 
 ***Note**: This package does not play audio or video itself. It's just a widget you can use to show the progress of your audio or video player. This widget is easier to connect to a media player than the Flutter Slider widget is. It also supports showing the buffered status for streamed media.*
 
@@ -64,11 +64,11 @@ Thanks to the [just_audio code example](https://github.com/ryanheise/just_audio/
 
 The default colors use the theme's primary color, so changing the theme will also update this widget:
 
-![](https://github.com/suragch/audio_video_progress_bar/blob/master/supplemental/deep_purple_theme.png)
+![](./supplemental/deep_purple_theme.png)
 
-![](https://github.com/suragch/audio_video_progress_bar/blob/master/supplemental/orange_theme.png)
+![](./supplemental/orange_theme.png)
 
-![](https://github.com/suragch/audio_video_progress_bar/blob/master/supplemental/dark_theme.png)
+![](./supplemental/dark_theme.png)
 
 However, you can set your own colors and sizes as well:
 
@@ -91,7 +91,7 @@ ProgressBar(
 
 Which would look like this (if the app has a dark theme):
 
-![](https://github.com/suragch/audio_video_progress_bar/blob/master/supplemental/custom_theme.png)
+![](./supplemental/custom_theme.png)
 
 You can also set the location of the time labels:
 
@@ -104,7 +104,7 @@ ProgressBar(
 
 Now the time labels are displayed on the side:
 
-![](https://github.com/suragch/audio_video_progress_bar/blob/master/supplemental/side_labels.png)
+![](./supplemental/side_labels.png)
 
 ## Notes
 
