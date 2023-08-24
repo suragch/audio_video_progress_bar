@@ -1,3 +1,8 @@
+## [2.0.0] - August 24, 2023
+
+- Bump to Dart 3.0 and Flutter 3.0.
+- Fix time label overflow (#60).
+
 ## [1.0.1] - March 22, 2023
 
 -  Fix String format when Duration is negative (@swiftymf) (#38) 

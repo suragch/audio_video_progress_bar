@@ -545,15 +545,16 @@ class _RenderProgressBar extends RenderBox {
   Duration get progress => _progress;
   Duration _progress = Duration.zero;
   set progress(Duration value) {
-    if (_progress == value) {
+    final clamp = _clampDuration(value);
+    if (_progress == clamp) {
       return;
     }
-    if (_labelLengthDifferent(_progress, value)) {
+    if (_labelLengthDifferent(_progress, clamp)) {
       _clearLabelCache();
     }
     if (!_userIsDraggingThumb) {
-      _progress = value;
-      _thumbValue = _proportionOfTotal(value);
+      _progress = clamp;
+      _thumbValue = _proportionOfTotal(clamp);
     }
     markNeedsPaint();
   }
@@ -614,13 +615,14 @@ class _RenderProgressBar extends RenderBox {
   Duration get total => _total;
   Duration _total;
   set total(Duration value) {
-    if (_total == value) {
+    final clamp = (value.isNegative) ? Duration.zero : value;
+    if (_total == clamp) {
       return;
     }
-    if (_labelLengthDifferent(_total, value)) {
+    if (_labelLengthDifferent(_total, clamp)) {
       _clearLabelCache();
     }
-    _total = value;
+    _total = clamp;
     if (!_userIsDraggingThumb) {
       _thumbValue = _proportionOfTotal(progress);
     }
@@ -631,11 +633,18 @@ class _RenderProgressBar extends RenderBox {
   Duration get buffered => _buffered;
   Duration _buffered;
   set buffered(Duration value) {
-    if (_buffered == value) {
+    final clamp = _clampDuration(value);
+    if (_buffered == clamp) {
       return;
     }
-    _buffered = value;
+    _buffered = clamp;
     markNeedsPaint();
+  }
+
+  Duration _clampDuration(Duration value) {
+    if (value.isNegative) return Duration.zero;
+    if (value.compareTo(_total) > 0) return _total;
+    return value;
   }
 
   /// A callback for the audio duration position to where the thumb was moved.
@@ -1050,16 +1059,13 @@ class _RenderProgressBar extends RenderBox {
   }
 
   double _proportionOfTotal(Duration duration) {
-    if (total.inMilliseconds == 0 || duration.isNegative) {
+    if (total.inMilliseconds == 0) {
       return 0.0;
     }
     return duration.inMilliseconds / total.inMilliseconds;
   }
 
   String _getTimeString(Duration time) {
-    if (time.isNegative) {
-      return '0:00';
-    }
     final minutes =
         time.inMinutes.remainder(Duration.minutesPerHour).toString();
     final seconds = time.inSeconds
