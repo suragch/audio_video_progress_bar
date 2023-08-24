@@ -548,7 +548,7 @@ class _RenderProgressBar extends RenderBox {
     if (_progress == value) {
       return;
     }
-    if (_progress.inHours != value.inHours) {
+    if (_labelLengthDifferent(_progress, value)) {
       _clearLabelCache();
     }
     if (!_userIsDraggingThumb) {
@@ -556,6 +556,15 @@ class _RenderProgressBar extends RenderBox {
       _thumbValue = _proportionOfTotal(value);
     }
     markNeedsPaint();
+  }
+
+  bool _labelLengthDifferent(Duration first, Duration second) {
+    return (first.inMinutes < 10 && second.inMinutes >= 10) ||
+        (first.inMinutes >= 10 && second.inMinutes < 10) ||
+        (first.inHours == 0 && second.inHours != 0) ||
+        (first.inHours != 0 && second.inHours == 0) ||
+        (first.inHours < 10 && second.inHours >= 10) ||
+        (first.inHours >= 10 && second.inHours < 10);
   }
 
   TextPainter? _cachedLeftLabel;
@@ -608,7 +617,7 @@ class _RenderProgressBar extends RenderBox {
     if (_total == value) {
       return;
     }
-    if (_total.inHours != value.inHours) {
+    if (_labelLengthDifferent(_total, value)) {
       _clearLabelCache();
     }
     _total = value;
