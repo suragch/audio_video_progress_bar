@@ -94,6 +94,7 @@ class _FullExampleState extends State<FullExample> {
   TextStyle? _labelStyle;
   var _thumbRadius = 10.0;
   var _labelPadding = 0.0;
+  var _labelTextScaleFactor = 1.0;
   var _barHeight = 5.0;
   var _barCapShape = BarCapShape.round;
   Color? _baseBarColor;
@@ -136,6 +137,7 @@ class _FullExampleState extends State<FullExample> {
                     _labelLocationButtons(),
                     _labelTypeButtons(),
                     _labelSizeButtons(),
+                    _textScaleSizeButtons(),
                     _paddingSizeButtons(),
                     const SizedBox(height: 20),
                     const Text(
@@ -326,6 +328,29 @@ class _FullExampleState extends State<FullExample> {
     ]);
   }
 
+  Wrap _textScaleSizeButtons() {
+    return Wrap(children: [
+      OutlinedButton(
+        child: const Text('standard text scale'),
+        onPressed: () {
+          setState(() => _labelTextScaleFactor = 1.0);
+        },
+      ),
+      OutlinedButton(
+        child: const Text('2 text scale'),
+        onPressed: () {
+          setState(() => _labelTextScaleFactor = 2.0);
+        },
+      ),
+      OutlinedButton(
+        child: const Text('3 text scale'),
+        onPressed: () {
+          setState(() => _labelTextScaleFactor = 3.0);
+        },
+      ),
+    ]);
+  }
+
   Wrap _barHeightButtons() {
     return Wrap(children: [
       OutlinedButton(
@@ -441,6 +466,7 @@ class _FullExampleState extends State<FullExample> {
           timeLabelType: _labelType,
           timeLabelTextStyle: _labelStyle,
           timeLabelPadding: _labelPadding,
+          timeLabelTextScaleFactor: _labelTextScaleFactor,
         );
       },
     );
