@@ -40,6 +40,7 @@ void main() {
         timeLabelLocation: TimeLabelLocation.sides,
         timeLabelType: TimeLabelType.remainingTime,
         timeLabelTextStyle: const TextStyle(color: Color(0x00000000)),
+        timeLabelTextScaleFactor: 1.5,
       ),
     );
 
@@ -65,6 +66,7 @@ void main() {
     expect(progressBar.timeLabelTextStyle,
         const TextStyle(color: Color(0x00000000)));
     expect(progressBar.timeLabelPadding, 0.0);
+    expect(progressBar.timeLabelTextScaleFactor, 1.5);
   });
 
   testWidgets('TimeLabelLocation.below size correct',
