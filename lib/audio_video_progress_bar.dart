@@ -257,6 +257,7 @@ class ProgressBar extends LeafRenderObjectWidget {
     final theme = Theme.of(context);
     final primaryColor = theme.colorScheme.primary;
     final textStyle = timeLabelTextStyle ?? theme.textTheme.bodyLarge;
+    final textScaleFactor = MediaQuery.textScaleFactorOf(context);
     return _RenderProgressBar(
       progress: progress,
       total: total,
@@ -280,6 +281,7 @@ class ProgressBar extends LeafRenderObjectWidget {
       timeLabelType: timeLabelType ?? TimeLabelType.totalTime,
       timeLabelTextStyle: textStyle,
       timeLabelPadding: timeLabelPadding,
+      textScaleFactor: textScaleFactor,
     );
   }
 
@@ -288,6 +290,7 @@ class ProgressBar extends LeafRenderObjectWidget {
     final theme = Theme.of(context);
     final primaryColor = theme.colorScheme.primary;
     final textStyle = timeLabelTextStyle ?? theme.textTheme.bodyLarge;
+    final textScaleFactor = MediaQuery.textScaleFactorOf(context);
     (renderObject as _RenderProgressBar)
       ..progress = progress
       ..total = total
@@ -310,7 +313,8 @@ class ProgressBar extends LeafRenderObjectWidget {
       ..timeLabelLocation = timeLabelLocation ?? TimeLabelLocation.below
       ..timeLabelType = timeLabelType ?? TimeLabelType.totalTime
       ..timeLabelTextStyle = textStyle
-      ..timeLabelPadding = timeLabelPadding;
+      ..timeLabelPadding = timeLabelPadding
+      ..textScaleFactor = textScaleFactor;
   }
 
   @override
@@ -425,6 +429,7 @@ class _RenderProgressBar extends RenderBox {
     required TimeLabelType timeLabelType,
     TextStyle? timeLabelTextStyle,
     double timeLabelPadding = 0.0,
+    double textScaleFactor = 1.0,
   })  : _total = total,
         _buffered = buffered,
         _onSeek = onSeek,
@@ -444,7 +449,8 @@ class _RenderProgressBar extends RenderBox {
         _timeLabelLocation = timeLabelLocation,
         _timeLabelType = timeLabelType,
         _timeLabelTextStyle = timeLabelTextStyle,
-        _timeLabelPadding = timeLabelPadding {
+        _timeLabelPadding = timeLabelPadding,
+        _textScaleFactor = textScaleFactor {
     _drag = _EagerHorizontalDragGestureRecognizer()
       ..onStart = _onDragStart
       ..onUpdate = _onDragUpdate
@@ -606,6 +612,7 @@ class _RenderProgressBar extends RenderBox {
     TextPainter textPainter = TextPainter(
       text: TextSpan(text: text, style: _timeLabelTextStyle),
       textDirection: TextDirection.ltr,
+      textScaleFactor: textScaleFactor,
     );
     textPainter.layout(minWidth: 0, maxWidth: double.infinity);
     return textPainter;
@@ -815,6 +822,17 @@ class _RenderProgressBar extends RenderBox {
   set timeLabelPadding(double value) {
     if (_timeLabelPadding == value) return;
     _timeLabelPadding = value;
+    markNeedsLayout();
+  }
+
+  /// The text scale factor for the `progress` and `total` text labels.
+  /// By default the value is 1.0.
+  double get textScaleFactor => _textScaleFactor;
+  double _textScaleFactor;
+  set textScaleFactor(double value) {
+    if (_textScaleFactor == value) return;
+    _textScaleFactor = value;
+    _clearLabelCache();
     markNeedsLayout();
   }
 

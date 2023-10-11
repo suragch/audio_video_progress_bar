@@ -1,3 +1,7 @@
+## [2.0.1] - October 11, 2023
+
+- Fix text scale factor for progress and total labels (@stutid) (#61 and #63).
+
 ## [2.0.0] - August 24, 2023
 
 - Bump to Dart 3.0 and Flutter 3.0.
