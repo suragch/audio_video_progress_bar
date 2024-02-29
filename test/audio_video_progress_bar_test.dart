@@ -84,7 +84,7 @@ void main() {
 
     final baseSize = tester.getSize(find.byType(ProgressBar));
     expect(baseSize.width, equals(800.0));
-    expect(baseSize.height, equals(34.0));
+    expect(baseSize.height, equals(44.0));
   });
 
   testWidgets('TimeLabelLocation.above size correct',
@@ -104,7 +104,7 @@ void main() {
 
     final baseSize = tester.getSize(find.byType(ProgressBar));
     expect(baseSize.width, equals(800.0));
-    expect(baseSize.height, equals(34.0));
+    expect(baseSize.height, equals(44.0));
   });
 
   testWidgets('TimeLabelLocation.sides size correct',
@@ -124,7 +124,7 @@ void main() {
 
     final baseSize = tester.getSize(find.byType(ProgressBar));
     expect(baseSize.width, equals(800.0));
-    expect(baseSize.height, equals(20.0));
+    expect(baseSize.height, equals(24.0));
   });
 
   testWidgets('TimeLabelLocation.none size correct',
@@ -163,7 +163,7 @@ void main() {
 
     final baseSize = tester.getSize(find.byType(ProgressBar));
     expect(baseSize.width, equals(800.0));
-    expect(baseSize.height, equals(34.0));
+    expect(baseSize.height, equals(44.0));
   });
 
   testWidgets('Changing the thumb radius changes the widget size',
@@ -206,7 +206,7 @@ void main() {
 
     final baseSize = tester.getSize(find.byType(ProgressBar));
     expect(baseSize.width, equals(800.0));
-    expect(baseSize.height, equals(14.0));
+    expect(baseSize.height, equals(24.0));
   });
 
   group('timeLabelPadding -', () {
@@ -228,7 +228,7 @@ void main() {
 
       final baseSize = tester.getSize(find.byType(ProgressBar));
       expect(baseSize.width, equals(800.0));
-      expect(baseSize.height, equals(44.0));
+      expect(baseSize.height, equals(54.0));
     });
 
     testWidgets('Size with timeLabelPadding is correct when labels above',
@@ -249,7 +249,7 @@ void main() {
 
       final baseSize = tester.getSize(find.byType(ProgressBar));
       expect(baseSize.width, equals(800.0));
-      expect(baseSize.height, equals(44.0));
+      expect(baseSize.height, equals(54.0));
     });
 
     testWidgets('Size with timeLabelPadding is correct when labels on sides',
@@ -270,7 +270,7 @@ void main() {
 
       final baseSize = tester.getSize(find.byType(ProgressBar));
       expect(baseSize.width, equals(800.0));
-      expect(baseSize.height, equals(20.0));
+      expect(baseSize.height, equals(24.0));
     });
 
     testWidgets('Size with timeLabelPadding is correct when no labels',
@@ -389,11 +389,11 @@ void main() {
       // drag from the middle of the widget to the far left side
       await tester.drag(find.byType(ProgressBar), const Offset(-100, 0));
       expect(onDragStartDetails.globalPosition, const Offset(400.0, 300.0));
-      expect(onDragStartDetails.localPosition, const Offset(100.0, 17.0));
+      expect(onDragStartDetails.localPosition, const Offset(100.0, 22.0));
       expect(onDragDetails[0].globalPosition, const Offset(380.0, 300.0));
-      expect(onDragDetails[0].localPosition, const Offset(80.0, 17.0));
+      expect(onDragDetails[0].localPosition, const Offset(80.0, 22.0));
       expect(onDragDetails[1].globalPosition, const Offset(300.0, 300.0));
-      expect(onDragDetails[1].localPosition, const Offset(0.0, 17.0));
+      expect(onDragDetails[1].localPosition, const Offset(0.0, 22.0));
     });
   });
 }

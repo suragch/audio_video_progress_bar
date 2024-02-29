@@ -1,3 +1,8 @@
+## [2.0.2] - February 29, 2023
+
+- Improve accessibility support for gesture-based adjustments (@orz12) (#66)
+- Update failing tests (possibly a font issue - unclear)
+
 ## [2.0.1] - October 11, 2023
 
 - Fix text scale factor for progress and total labels (@stutid) (#61 and #63).
