@@ -1124,6 +1124,7 @@ class _RenderProgressBar extends RenderBox {
     _thumbValue = (newValue).clamp(0.0, 1.0);
     markNeedsPaint();
     markNeedsSemanticsUpdate();
+    onSeek?.call(_currentThumbDuration());
   }
 
   void decreaseAction() {
@@ -1131,5 +1132,6 @@ class _RenderProgressBar extends RenderBox {
     _thumbValue = (newValue).clamp(0.0, 1.0);
     markNeedsPaint();
     markNeedsSemanticsUpdate();
+    onSeek?.call(_currentThumbDuration());
   }
 }
