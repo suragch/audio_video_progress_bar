@@ -211,9 +211,9 @@ class _FullExampleState extends State<FullExample> {
   Wrap _labelLocationButtons() {
     return Wrap(children: [
       OutlinedButton(
-        child: const Text('below'),
+        child: const Text('end'),
         onPressed: () {
-          setState(() => _labelLocation = TimeLabelLocation.below);
+          setState(() => _labelLocation = TimeLabelLocation.end);
         },
       ),
       OutlinedButton(
