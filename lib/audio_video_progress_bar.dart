@@ -594,6 +594,13 @@ class _RenderProgressBar extends RenderBox {
   void _clearLabelCache() {
     _cachedLeftLabel = null;
     _cachedRightLabel = null;
+    _cachedEndLabel = null;
+  }
+
+  TextPainter? _cachedEndLabel;
+  Size get _endLabelSize {
+    _cachedRightLabel ??= _getProgressAndTotalTime();
+    return _cachedRightLabel!.size;
   }
 
   TextPainter _leftTimeLabel() {
@@ -1003,29 +1010,28 @@ class _RenderProgressBar extends RenderBox {
     _drawProgressBar(canvas, Offset(barDx, barDy), Size(barWidth, barHeight));
   }
 
-  TextPainter getProgressAndTotalTime() {
+  TextPainter _getProgressAndTotalTime() {
     final text = _getTimeString(progress) + " / " + _getTimeString(total);
     return _layoutText(text);
   }
 
   void _drawProgressBarWithLabelsAtEnd(Canvas canvas) {
-    final rightLabelSize = _rightLabelSize;
-    final rightLabelWidth = rightLabelSize.width * 2;
-    final totalLabelDx = size.width - rightLabelWidth;
-    final leftLabelSize = _leftLabelSize;
-    final verticalOffset = size.height / 2 - leftLabelSize.height / 2;
+    final rightLabelSize = _endLabelSize;
+    final endLabelWidth = rightLabelSize.width * 2;
+    final totalLabelDx = size.width - endLabelWidth;
+    // final leftLabelSize = _leftLabelSize;
+    final verticalOffset = size.height / 2 - rightLabelSize.height / 2;
 
     final totalLabelOffset = Offset(totalLabelDx, verticalOffset);
-    getProgressAndTotalTime().paint(canvas, totalLabelOffset);
+    _getProgressAndTotalTime().paint(canvas, totalLabelOffset);
 
     // progress bar
-    final leftLabelWidth = 0;
+
     final barHeight = _heightWhenNoLabels();
     final barWidth = size.width -
         2 * _defaultSidePadding -
         2 * _timeLabelPadding -
-        leftLabelWidth -
-        rightLabelWidth;
+        endLabelWidth;
     final barDy = size.height / 2 - barHeight / 2;
 
     _drawProgressBar(
