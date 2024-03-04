@@ -25,6 +25,11 @@ enum TimeLabelLocation {
   ///  | 01:23 -------O---------------- 05:00 |
   sides,
 
+  ///  The time is displayed on the sides of the progress bar.
+  ///
+  ///  | -------O---------------- 01:23 / 05:00 |
+  end,
+
   ///  The time is not displayed.
   ///
   ///  | -------O---------------- |
@@ -883,7 +888,9 @@ class _RenderProgressBar extends RenderBox {
       case TimeLabelLocation.above:
         return _heightWhenLabelsAboveOrBelow();
       case TimeLabelLocation.sides:
+      case TimeLabelLocation.end:
         return _heightWhenLabelsOnSides();
+
       default:
         return _heightWhenNoLabels();
     }
@@ -921,6 +928,9 @@ class _RenderProgressBar extends RenderBox {
         break;
       case TimeLabelLocation.sides:
         _drawProgressBarWithLabelsOnSides(canvas);
+        break;
+      case TimeLabelLocation.end:
+        _drawProgressBarWithLabelsAtEnd(canvas);
         break;
       default:
         _drawProgressBarWithoutLabels(canvas);
@@ -991,6 +1001,35 @@ class _RenderProgressBar extends RenderBox {
     final barDy = size.height / 2 - barHeight / 2;
     final barDx = leftLabelWidth + _defaultSidePadding + _timeLabelPadding;
     _drawProgressBar(canvas, Offset(barDx, barDy), Size(barWidth, barHeight));
+  }
+
+  TextPainter getProgressAndTotalTime() {
+    final text = _getTimeString(progress) + " / " + _getTimeString(total);
+    return _layoutText(text);
+  }
+
+  void _drawProgressBarWithLabelsAtEnd(Canvas canvas) {
+    final rightLabelSize = _rightLabelSize;
+    final rightLabelWidth = rightLabelSize.width * 2;
+    final totalLabelDx = size.width - rightLabelWidth;
+    final leftLabelSize = _leftLabelSize;
+    final verticalOffset = size.height / 2 - leftLabelSize.height / 2;
+
+    final totalLabelOffset = Offset(totalLabelDx, verticalOffset);
+    getProgressAndTotalTime().paint(canvas, totalLabelOffset);
+
+    // progress bar
+    final leftLabelWidth = 0;
+    final barHeight = _heightWhenNoLabels();
+    final barWidth = size.width -
+        2 * _defaultSidePadding -
+        2 * _timeLabelPadding -
+        leftLabelWidth -
+        rightLabelWidth;
+    final barDy = size.height / 2 - barHeight / 2;
+
+    _drawProgressBar(
+        canvas, Offset(_defaultSidePadding, barDy), Size(barWidth, barHeight));
   }
 
   /// Draw the progress bar without labels like this:
