@@ -1017,8 +1017,8 @@ class _RenderProgressBar extends RenderBox {
 
   void _drawProgressBarWithLabelsAtEnd(Canvas canvas) {
     final rightLabelSize = _endLabelSize;
-    final endLabelWidth = rightLabelSize.width * 2;
-    final totalLabelDx = size.width - endLabelWidth - _defaultSidePadding;
+    final endLabelWidth = rightLabelSize.width + _defaultSidePadding;
+    final totalLabelDx = size.width - endLabelWidth - _defaultSidePadding * 2;
     // final leftLabelSize = _leftLabelSize;
     final verticalOffset = size.height / 2 - rightLabelSize.height / 2;
 
@@ -1031,8 +1031,7 @@ class _RenderProgressBar extends RenderBox {
     final barWidth = size.width - 3 * _defaultSidePadding - endLabelWidth;
     final barDy = size.height / 2 - barHeight / 2;
 
-    _drawProgressBar(
-        canvas, Offset(_defaultSidePadding, barDy), Size(barWidth, barHeight));
+    _drawProgressBar(canvas, Offset(0, barDy), Size(barWidth, barHeight));
   }
 
   /// Draw the progress bar without labels like this:
