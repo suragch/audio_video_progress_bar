@@ -211,9 +211,9 @@ class _FullExampleState extends State<FullExample> {
   Wrap _labelLocationButtons() {
     return Wrap(children: [
       OutlinedButton(
-        child: const Text('below'),
+        child: const Text('end'),
         onPressed: () {
-          setState(() => _labelLocation = TimeLabelLocation.below);
+          setState(() => _labelLocation = TimeLabelLocation.end);
         },
       ),
       OutlinedButton(
@@ -439,7 +439,8 @@ class _FullExampleState extends State<FullExample> {
           thumbCanPaintOutsideBar: _thumbCanPaintOutsideBar,
           timeLabelLocation: _labelLocation,
           timeLabelType: _labelType,
-          timeLabelTextStyle: _labelStyle,
+          timeLabelTextStyle: TextStyle(
+              fontSize: 18, fontWeight: FontWeight.w900, color: Colors.red),
           timeLabelPadding: _labelPadding,
         );
       },
