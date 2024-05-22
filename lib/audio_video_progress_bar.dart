@@ -999,7 +999,7 @@ class _RenderProgressBar extends RenderBox {
   ///
   void _drawProgressBarWithoutLabels(Canvas canvas) {
     final barWidth = size.width;
-    final barHeight = 2 * _thumbRadius;
+    final barHeight = _heightWhenNoLabels();
     _drawProgressBar(canvas, Offset.zero, Size(barWidth, barHeight));
   }
 
