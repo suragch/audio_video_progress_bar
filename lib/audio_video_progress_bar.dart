@@ -79,6 +79,7 @@ class ProgressBar extends LeafRenderObjectWidget {
     required this.total,
     this.buffered,
     this.onSeek,
+    this.dragEnabled = true,
     this.onDragStart,
     this.onDragUpdate,
     this.onDragEnd,
@@ -124,6 +125,13 @@ class ProgressBar extends LeafRenderObjectWidget {
   /// see [onDragUpdate], where the provided [ThumbDragDetails] has a
   /// `timeStamp` with the seek duration on it.
   final ValueChanged<Duration>? onSeek;
+
+  /// Whether the user can move the thumb for seeking or not.
+  ///
+  /// The default is `true`.
+  ///
+  /// When set to `false` the drag gestures will be ignored.
+  final bool dragEnabled;
 
   /// A callback when the user starts to move the thumb.
   ///
@@ -282,6 +290,7 @@ class ProgressBar extends LeafRenderObjectWidget {
       timeLabelTextStyle: textStyle,
       timeLabelPadding: timeLabelPadding,
       textScaleFactor: textScaleFactor,
+      dragEnabled: dragEnabled,
     );
   }
 
@@ -430,6 +439,7 @@ class _RenderProgressBar extends RenderBox {
     TextStyle? timeLabelTextStyle,
     double timeLabelPadding = 0.0,
     double textScaleFactor = 1.0,
+    bool dragEnabled = true,
   })  : _total = total,
         _buffered = buffered,
         _onSeek = onSeek,
@@ -450,7 +460,8 @@ class _RenderProgressBar extends RenderBox {
         _timeLabelType = timeLabelType,
         _timeLabelTextStyle = timeLabelTextStyle,
         _timeLabelPadding = timeLabelPadding,
-        _textScaleFactor = textScaleFactor {
+        _textScaleFactor = textScaleFactor,
+        _dragEnabled = dragEnabled {
     _drag = _EagerHorizontalDragGestureRecognizer()
       ..onStart = _onDragStart
       ..onUpdate = _onDragUpdate
@@ -464,6 +475,9 @@ class _RenderProgressBar extends RenderBox {
 
   // This is the gesture recognizer used to move the thumb.
   _EagerHorizontalDragGestureRecognizer? _drag;
+
+  // This switch controls whether the drag is enabled or not.
+  bool _dragEnabled;
 
   // This is a value between 0.0 and 1.0 used to indicate the position on
   // the bar.
@@ -858,7 +872,9 @@ class _RenderProgressBar extends RenderBox {
   void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
     assert(debugHandleEvent(event, entry));
     if (event is PointerDownEvent) {
-      _drag?.addPointer(event);
+      if (_dragEnabled) {
+        _drag?.addPointer(event);
+      }
     }
   }
 
