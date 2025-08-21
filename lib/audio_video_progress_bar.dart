@@ -60,6 +60,13 @@ enum BarCapShape {
   square,
 }
 
+/// A function that formats a duration into a string.
+///
+/// This is used to format the duration of the progress bar.
+///
+/// The default formatter is `Duration.toString()`.
+typedef DurationFormatter = String Function(Duration duration);
+
 /// A progress bar widget to show or set the location of the currently
 /// playing audio or video content.
 ///
@@ -96,6 +103,7 @@ class ProgressBar extends LeafRenderObjectWidget {
     this.timeLabelType,
     this.timeLabelTextStyle,
     this.timeLabelPadding = 0.0,
+    this.durationFormatter,
   }) : super(key: key);
 
   /// The elapsed playing time of the media.
@@ -252,6 +260,13 @@ class ProgressBar extends LeafRenderObjectWidget {
   /// the progress bar and a negative number will move them closer.
   final double timeLabelPadding;
 
+  /// A function that formats a duration into a string.
+  ///
+  /// This is used to format the duration of the progress bar.
+  ///
+  /// The default formatter is `Duration.toString()`.
+  final DurationFormatter? durationFormatter;
+
   @override
   RenderObject createRenderObject(BuildContext context) {
     final theme = Theme.of(context);
@@ -282,6 +297,7 @@ class ProgressBar extends LeafRenderObjectWidget {
       timeLabelTextStyle: textStyle,
       timeLabelPadding: timeLabelPadding,
       textScaleFactor: textScaleFactor,
+      durationFormatter: durationFormatter,
     );
   }
 
@@ -314,7 +330,8 @@ class ProgressBar extends LeafRenderObjectWidget {
       ..timeLabelType = timeLabelType ?? TimeLabelType.totalTime
       ..timeLabelTextStyle = textStyle
       ..timeLabelPadding = timeLabelPadding
-      ..textScaleFactor = textScaleFactor;
+      ..textScaleFactor = textScaleFactor
+      ..durationFormatter = durationFormatter;
   }
 
   @override
@@ -357,6 +374,9 @@ class ProgressBar extends LeafRenderObjectWidget {
     properties
         .add(DiagnosticsProperty('timeLabelTextStyle', timeLabelTextStyle));
     properties.add(DoubleProperty('timeLabelPadding', timeLabelPadding));
+    properties.add(ObjectFlagProperty<DurationFormatter>(
+        'durationFormatter', durationFormatter,
+        ifNull: 'unimplemented'));
   }
 }
 
@@ -430,6 +450,7 @@ class _RenderProgressBar extends RenderBox {
     TextStyle? timeLabelTextStyle,
     double timeLabelPadding = 0.0,
     double textScaleFactor = 1.0,
+    DurationFormatter? durationFormatter,
   })  : _total = total,
         _buffered = buffered,
         _onSeek = onSeek,
@@ -450,7 +471,8 @@ class _RenderProgressBar extends RenderBox {
         _timeLabelType = timeLabelType,
         _timeLabelTextStyle = timeLabelTextStyle,
         _timeLabelPadding = timeLabelPadding,
-        _textScaleFactor = textScaleFactor {
+        _textScaleFactor = textScaleFactor,
+        _durationFormatter = durationFormatter {
     _drag = _EagerHorizontalDragGestureRecognizer()
       ..onStart = _onDragStart
       ..onUpdate = _onDragUpdate
@@ -836,6 +858,14 @@ class _RenderProgressBar extends RenderBox {
     markNeedsLayout();
   }
 
+  DurationFormatter? get durationFormatter => _durationFormatter;
+  DurationFormatter? _durationFormatter;
+  set durationFormatter(DurationFormatter? value) {
+    if (_durationFormatter == value) return;
+    _durationFormatter = value;
+    markNeedsLayout();
+  }
+
   // The smallest that this widget would ever want to be.
   static const _minDesiredWidth = 100.0;
 
@@ -1084,6 +1114,9 @@ class _RenderProgressBar extends RenderBox {
   }
 
   String _getTimeString(Duration time) {
+    if (_durationFormatter != null) {
+      return _durationFormatter!(time);
+    }
     final minutes =
         time.inMinutes.remainder(Duration.minutesPerHour).toString();
     final seconds = time.inSeconds
